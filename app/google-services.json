@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "587931830529",
+    "project_id": "smartquiz-dcf3e",
+    "storage_bucket": "smartquiz-dcf3e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:587931830529:android:5ce2b5352772f452c13300",
+        "android_client_info": {
+          "package_name": "com.example.smartquiz"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUxeR17meFHFaEG4JteYHS5hfC2BZHKkE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
