@@ -4,6 +4,17 @@ import java.util.Date;
 import java.util.List;
 
 public class Submission {
+    private String examId;
+    private String studentId;
+    private Date submittedAt;
+    private int score;
+    private List<SubmissionAnswer> answers;
+
+    public Submission() {
+        // Required for Firestore
+    }
+
+    // Getters and setters
     public String getExamId() {
         return examId;
     }
@@ -43,12 +54,4 @@ public class Submission {
     public void setAnswers(List<SubmissionAnswer> answers) {
         this.answers = answers;
     }
-
-    public String examId;
-    public String studentId;
-    public Date submittedAt;
-    public int score;
-    public List<SubmissionAnswer> answers;
-
-    public Submission() {}
 }

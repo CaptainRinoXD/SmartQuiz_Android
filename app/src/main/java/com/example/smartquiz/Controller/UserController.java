@@ -4,9 +4,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 
-public class User extends BaseController{
-    public void createUser(User user, OnCompleteListener<Void> listener) {
-        db.collection("users").document(getCurrentUserId()).set(user)
+public class UserController extends BaseController{
+    public void createUser(UserController userController, OnCompleteListener<Void> listener) {
+        db.collection("users").document(getCurrentUserId()).set(userController)
                 .addOnCompleteListener(listener);
     }
 
