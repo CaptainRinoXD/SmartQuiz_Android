@@ -64,5 +64,4 @@
             app:srcCompat="@drawable/menu_24px" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
