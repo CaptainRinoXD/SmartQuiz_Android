@@ -3,6 +3,12 @@ package com.example.smartquiz.Model;
 import java.util.Date;
 
 public class Exam {
+    public String title;
+    public String createdBy;
+    public Date createdAt;
+    public int duration;
+
+    public Exam() {}
     public String getTitle() {
         return title;
     }
@@ -19,24 +25,18 @@ public class Exam {
         this.createdBy = createdBy;
     }
 
-    public String title;
-    public String createdBy;
-    public Date createdAt;
-
-    public Exam() {}
-
-    public Exam(String title, String createdBy, Date createdAt) {
-        this.title = title;
-        this.createdBy = createdBy;
-        this.createdAt = createdAt;
-    }
-
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
     public Date getCreatedAt() {
         return createdAt;
+    }
+
+    public Exam(String title, String createdBy, Date createdAt) {
+        this.title = title;
+        this.createdBy = createdBy;
+        this.createdAt = createdAt;
     }
 }
 
