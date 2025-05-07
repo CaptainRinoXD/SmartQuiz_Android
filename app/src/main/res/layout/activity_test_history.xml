@@ -6,34 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/light_blue">
 
-    <ScrollView
-        android:id="@+id/scroll_list"
-        android:layout_width="0dp"
-        android:layout_height="768dp"
-        android:layout_margin="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.625"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <LinearLayout
-            android:id="@+id/topic_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="4dp"
-                android:background="@drawable/white_box"
-                android:padding="16dp"
-                android:text="Đề 1" />
-
-
-        </LinearLayout>
-    </ScrollView>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="406dp"
@@ -73,7 +45,7 @@
             app:layout_constraintStart_toEndOf="@+id/user_name"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
-            app:srcCompat="@drawable/account_circle_24px" />
+            app:srcCompat="@drawable/user" />
 
         <ImageView
             android:id="@+id/imageView"
@@ -89,9 +61,37 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
-            app:srcCompat="@drawable/menu_24px" />
+            app:srcCompat="@drawable/menu" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:id="@+id/scroll_list"
+        android:layout_width="0dp"
+        android:layout_height="768dp"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.625"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:id="@+id/topic_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="4dp"
+                android:background="@drawable/white_box"
+                android:padding="16dp"
+                android:text="Đề 1" />
+
+
+        </LinearLayout>
+    </ScrollView>
 
     <TextView
         android:id="@+id/textView18"
