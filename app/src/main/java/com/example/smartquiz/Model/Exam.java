@@ -33,10 +33,19 @@ public class Exam {
         return createdAt;
     }
 
-    public Exam(String title, String createdBy, Date createdAt) {
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public Exam(String title, String createdBy, Date createdAt, int duration) {
         this.title = title;
         this.createdBy = createdBy;
         this.createdAt = createdAt;
+        this.duration = duration;
     }
 }
 

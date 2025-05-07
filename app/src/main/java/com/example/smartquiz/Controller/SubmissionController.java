@@ -6,14 +6,16 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public class SubmissionController extends BaseController {
-    public void submitExam(Submission submission, OnCompleteListener<Void> listener) {
+    public void submitExam(Submission submission, int duration, OnCompleteListener<Void> listener) {
         submission.setStudentId(getCurrentUserId());
         submission.setSubmittedAt(new Date());
+        submission.setDuration(duration);
 
         // Lấy tất cả câu hỏi của bài thi từ Firestore
         db.collection("exams")
@@ -62,9 +64,6 @@ public class SubmissionController extends BaseController {
                 });
     }
 
-
-
-
     public void getStudentSubmission(String examId, OnSuccessListener<Submission> listener) {
         db.collection("submissions")
                 .whereEqualTo("examId", examId)
@@ -79,4 +78,49 @@ public class SubmissionController extends BaseController {
                     }
                 });
     }
+
+    public void getAllSubmissionsForStudent(OnSuccessListener<List<Submission>> listener) {
+        String studentId = getCurrentUserId();
+
+        db.collection("submissions")
+                .whereEqualTo("studentId", studentId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<Submission> submissions = new ArrayList<>();
+                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                        Submission submission = document.toObject(Submission.class);
+                        submissions.add(submission);
+                    }
+                    listener.onSuccess(submissions);
+                });
+    }
+
+    public void getTotalDurationForStudent(OnSuccessListener<Integer> listener) {
+        String studentId = getCurrentUserId();
+
+        db.collection("submissions")
+                .whereEqualTo("studentId", studentId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    int totalDuration = 0;
+                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                        Submission submission = document.toObject(Submission.class);
+                        totalDuration += submission.getDuration();
+                    }
+                    listener.onSuccess(totalDuration);
+                });
+    }
+
+    public void getSubmissionCountForStudent(OnSuccessListener<Integer> listener) {
+        String studentId = getCurrentUserId();
+
+        db.collection("submissions")
+                .whereEqualTo("studentId", studentId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    int submissionCount = querySnapshot.size();
+                    listener.onSuccess(submissionCount);
+                });
+    }
+
 }

@@ -9,6 +9,7 @@ public class Submission {
     private Date submittedAt;
     private int score;
     private List<SubmissionAnswer> answers;
+    private int duration;
 
     public Submission() {
         // Required for Firestore
@@ -53,5 +54,23 @@ public class Submission {
 
     public void setAnswers(List<SubmissionAnswer> answers) {
         this.answers = answers;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public Submission(String examId, String studentId, Date submittedAt, int score, List<SubmissionAnswer> answers,
+            int duration) {
+        this.examId = examId;
+        this.studentId = studentId;
+        this.submittedAt = submittedAt;
+        this.score = score;
+        this.answers = answers;
+        this.duration = duration;
     }
 }

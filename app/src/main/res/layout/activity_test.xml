@@ -134,7 +134,7 @@
         android:id="@+id/down_arrow"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:src="@drawable/arrow_downward_24px"
+
         android:contentDescription="Xem thêm"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
