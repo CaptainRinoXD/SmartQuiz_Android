@@ -35,80 +35,82 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.29" />
 
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="88dp"
-            android:layout_height="69dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="20dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/user_name"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            app:srcCompat="@drawable/user" />
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="74dp"
-            android:layout_height="63dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="16dp"
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:layout_width="71dp"
+            android:layout_height="53dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginBottom="25dp"
+            android:background="@null"
+            android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/user_name"
-            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
             app:srcCompat="@drawable/menu" />
 
+        <ImageButton
+            android:id="@+id/imageButton4"
+            android:layout_width="69dp"
+            android:layout_height="65dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="17dp"
+            android:layout_marginBottom="13dp"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/user_name"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/user" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!-- Mũi tên xuống -->
 
     <EditText
         android:id="@+id/search_box"
         android:layout_width="346dp"
         android:layout_height="41dp"
         android:layout_margin="8dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="4dp"
         android:background="@drawable/white_box"
         android:hint="Tìm kiếm"
         android:inputType="text"
         android:padding="12dp"
-        app:layout_constraintBottom_toBottomOf="@+id/down_arrow"
+        app:layout_constraintBottom_toTopOf="@+id/list_title"
         app:layout_constraintEnd_toEndOf="@id/search_icon"
-        app:layout_constraintHorizontal_bias="0.14"
+        app:layout_constraintHorizontal_bias="0.246"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-        app:layout_constraintVertical_bias="0.005" />
-
-    <ImageView
-        android:id="@+id/search_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/search_24px"
-        android:layout_marginEnd="8dp"
-        android:contentDescription="Search"
-        app:layout_constraintTop_toTopOf="@+id/search_box"
-        app:layout_constraintBottom_toBottomOf="@+id/search_box"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-
-    <!-- Mũi tên xuống -->
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
     <TextView
         android:id="@+id/list_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:text="Danh sách đề:"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/search_box" />
+
+    <ImageView
+        android:id="@+id/search_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="44dp"
+        android:contentDescription="Search"
+        android:src="@drawable/search_24px"
+        app:layout_constraintBottom_toTopOf="@+id/scroll_list"
+        app:layout_constraintStart_toEndOf="@+id/search_box" />
 
     <ScrollView
         android:id="@+id/scroll_list"
