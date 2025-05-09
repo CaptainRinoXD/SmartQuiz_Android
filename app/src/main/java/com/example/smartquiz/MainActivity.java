@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 🔽 Tìm view
         floatingMenu = findViewById(R.id.floating_menu);
-        menuButton = findViewById(R.id.imageView); // đây là nút menu
+        menuButton = findViewById(R.id.imageButton); // đây là nút menu
 
         // 🔽 Gắn sự kiện click
         menuButton.setOnClickListener(new View.OnClickListener() {
