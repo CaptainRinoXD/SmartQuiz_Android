@@ -46,24 +46,24 @@ public class MainActivity extends AppCompatActivity {
             isMenuVisible = !isMenuVisible;
         });
 
-        // Gắn click cho từng mục trong menu
-        TextView menuHome = findViewById(R.id.menu_home);
-        TextView menuTest = findViewById(R.id.menu_test);
-        TextView menuAnswer = findViewById(R.id.menu_answer);
-
-        menuHome.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-            startActivity(intent);
-        });
-
-        menuTest.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, TestActivity.class);
-            startActivity(intent);
-        });
-
-        menuAnswer.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, AnswerActivity.class);
-            startActivity(intent);
-        });
+//        // Gắn click cho từng mục trong menu
+//        TextView menuHome = findViewById(R.id.menu_home);
+//        TextView menuTest = findViewById(R.id.menu_test);
+//        TextView menuAnswer = findViewById(R.id.menu_answer);
+//
+//        menuHome.setOnClickListener(v -> {
+//            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+//            startActivity(intent);
+//        });
+//
+//        menuTest.setOnClickListener(v -> {
+//            Intent intent = new Intent(MainActivity.this, TestActivity.class);
+//            startActivity(intent);
+//        });
+//
+//        menuAnswer.setOnClickListener(v -> {
+//            Intent intent = new Intent(MainActivity.this, AnswerActivity.class);
+//            startActivity(intent);
+//        });
     }
 }
