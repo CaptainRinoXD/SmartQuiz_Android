@@ -13,7 +13,7 @@ import com.google.firebase.firestore.SetOptions;
 
 public class UserController extends BaseController {
 
-    public void signUpAndCreateUserDocument(String email, String password, final User userProfileData,
+    public void signUpUserDocument(String email, String password, final User userProfileData,
             OnCompleteListener<AuthResult> listener) {
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(authTask -> {
