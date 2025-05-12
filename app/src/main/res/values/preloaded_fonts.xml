@@ -2,6 +2,7 @@
 <resources>
     <array name="preloaded_fonts" translatable="false">
         <item>@font/be_vietnam_pro_light_italic</item>
+        <item>@font/hedvig_letters_sans</item>
         <item>@font/playfair_display</item>
     </array>
 </resources>

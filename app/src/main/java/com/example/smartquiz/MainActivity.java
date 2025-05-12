@@ -1,9 +1,11 @@
 package com.example.smartquiz;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,21 +32,38 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // 🔽 Tìm view
+        // Tìm view
         floatingMenu = findViewById(R.id.floating_menu);
-        //menuButton = findViewById(R.id.imageView); // đây là nút menu
+        menuButton = findViewById(R.id.imageButton);
 
-        // 🔽 Gắn sự kiện click
-        menuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isMenuVisible) {
-                    floatingMenu.setVisibility(View.GONE);
-                } else {
-                    floatingMenu.setVisibility(View.VISIBLE);
-                }
-                isMenuVisible = !isMenuVisible;
+        // Gắn sự kiện toggle menu
+        menuButton.setOnClickListener(v -> {
+            if (isMenuVisible) {
+                floatingMenu.setVisibility(View.GONE);
+            } else {
+                floatingMenu.setVisibility(View.VISIBLE);
             }
+            isMenuVisible = !isMenuVisible;
         });
+
+//        // Gắn click cho từng mục trong menu
+//        TextView menuHome = findViewById(R.id.menu_home);
+//        TextView menuTest = findViewById(R.id.menu_test);
+//        TextView menuAnswer = findViewById(R.id.menu_answer);
+//
+//        menuHome.setOnClickListener(v -> {
+//            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+//            startActivity(intent);
+//        });
+//
+//        menuTest.setOnClickListener(v -> {
+//            Intent intent = new Intent(MainActivity.this, TestActivity.class);
+//            startActivity(intent);
+//        });
+//
+//        menuAnswer.setOnClickListener(v -> {
+//            Intent intent = new Intent(MainActivity.this, AnswerActivity.class);
+//            startActivity(intent);
+//        });
     }
 }
