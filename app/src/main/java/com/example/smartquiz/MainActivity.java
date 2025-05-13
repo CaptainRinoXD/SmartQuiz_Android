@@ -13,11 +13,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.smartquiz.Controller.UserController;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout floatingMenu;
     private ImageView menuButton;
     private boolean isMenuVisible = false;
+    private UserController userController;
+    private TextView totalExamNumTextView;
+    private TextView totalTimeNumTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Tìm view
         floatingMenu = findViewById(R.id.floating_menu);
-        menuButton = findViewById(R.id.imageButton);
+        menuButton = findViewById(R.id.registerBtn);
 
         // Gắn sự kiện toggle menu
         menuButton.setOnClickListener(v -> {
@@ -46,24 +52,25 @@ public class MainActivity extends AppCompatActivity {
             isMenuVisible = !isMenuVisible;
         });
 
-//        // Gắn click cho từng mục trong menu
-//        TextView menuHome = findViewById(R.id.menu_home);
-//        TextView menuTest = findViewById(R.id.menu_test);
-//        TextView menuAnswer = findViewById(R.id.menu_answer);
-//
-//        menuHome.setOnClickListener(v -> {
-//            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-//            startActivity(intent);
-//        });
-//
-//        menuTest.setOnClickListener(v -> {
-//            Intent intent = new Intent(MainActivity.this, TestActivity.class);
-//            startActivity(intent);
-//        });
-//
-//        menuAnswer.setOnClickListener(v -> {
-//            Intent intent = new Intent(MainActivity.this, AnswerActivity.class);
-//            startActivity(intent);
-//        });
+        userController = new UserController();
+        String userId = userController.getCurrentUserId();
+
+        totalExamNumTextView = findViewById(R.id.total_exam_num);
+        totalTimeNumTextView = findViewById(R.id.total_time_num);
+
+        if (userId != null) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("users").document(userId)
+                    .get()
+                    .addOnSuccessListener(document -> {
+                        if (document.exists()) {
+                            long totalExams = document.getLong("total_exams");
+                            String totalTime = document.getString("total_time");
+
+                            totalExamNumTextView.setText(String.valueOf(totalExams));
+                            totalTimeNumTextView.setText(totalTime);
+                        }
+                    });
+        }
     }
 }

@@ -6,7 +6,7 @@ public abstract class  BaseController {
     protected FirebaseFirestore db = FirebaseFirestore.getInstance();
     protected FirebaseAuth auth = FirebaseAuth.getInstance();
 
-    protected String getCurrentUserId() {
+    public String getCurrentUserId() {
         FirebaseUser user = auth.getCurrentUser();
         return (user != null) ? user.getUid() : null;
     }
