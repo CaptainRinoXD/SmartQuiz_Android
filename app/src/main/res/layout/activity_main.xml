@@ -269,10 +269,10 @@
             app:layout_constraintVertical_bias="0.276" />
 
         <TextView
-            android:id="@+id/textView6"
+            android:id="@+id/total_exam_num"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="36"
+            android:text="00"
             android:textColor="#43558C"
             android:textSize="48sp"
             android:textStyle="bold"
@@ -284,10 +284,10 @@
             app:layout_constraintVertical_bias="0.189" />
 
         <TextView
-            android:id="@+id/textView11"
+            android:id="@+id/total_time_num"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="03:36"
+            android:text="00:00"
             android:textAlignment="center"
             android:textColor="#43558C"
             android:textSize="48sp"
@@ -326,7 +326,7 @@
         android:elevation="8dp"
         android:orientation="vertical"
         android:padding="12dp"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/constraintLayout">
