@@ -2,6 +2,7 @@ package com.example.smartquiz.Controller;
 
 import com.example.smartquiz.Model.Submission;
 import com.example.smartquiz.Model.SubmissionAnswer;
+import com.example.smartquiz.Model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -108,18 +109,28 @@ public class SubmissionController extends BaseController {
                         totalDuration += submission.getDuration();
                     }
                     listener.onSuccess(totalDuration);
+
+                    UserController userController = new UserController();
+                    User currentUser = new User();
+                    currentUser.setTotalTime(totalDuration);
+                    userController.updateUserDocument(currentUser, null);
+
                 });
     }
 
     public void getSubmissionCountForStudent(OnSuccessListener<Integer> listener) {
         String studentId = getCurrentUserId();
-
         db.collection("submissions")
                 .whereEqualTo("studentId", studentId)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     int submissionCount = querySnapshot.size();
                     listener.onSuccess(submissionCount);
+
+                    UserController userController = new UserController();
+                    User currentUser = new User();
+                    currentUser.setTotalExams(submissionCount);
+                    userController.updateUserDocument(currentUser, null);
                 });
     }
 

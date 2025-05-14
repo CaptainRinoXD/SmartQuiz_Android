@@ -5,15 +5,19 @@ public class User {
     private String name;
     private String email;
     private String role;
+    private long totalTime = 0;
+    private int totalExams = 0;
 
     public User() {
     }
 
-    public User(String uid, String name, String email, String role) {
+    public User(String uid, String name, String email, String role, long totalTime, int totalExams) {
         this.uid = uid;
         this.name = name;
         this.email = email;
         this.role = role;
+        this.totalTime = totalTime;
+        this.totalExams = totalExams;
     }
 
     public String getUid() {
@@ -46,5 +50,21 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public long getTotalTime() {
+        return totalTime;
+    }
+
+    public void setTotalTime(long totalTime) {
+        this.totalTime = totalTime;
+    }
+
+    public int getTotalExams() {
+        return totalExams;
+    }
+
+    public void setTotalExams(int totalExams) {
+        this.totalExams = totalExams;
     }
 }

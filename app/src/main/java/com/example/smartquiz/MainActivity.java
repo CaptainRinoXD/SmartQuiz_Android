@@ -14,6 +14,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.smartquiz.Controller.UserController;
+import com.example.smartquiz.Model.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
@@ -58,19 +59,31 @@ public class MainActivity extends AppCompatActivity {
         totalExamNumTextView = findViewById(R.id.total_exam_num);
         totalTimeNumTextView = findViewById(R.id.total_time_num);
 
-        if (userId != null) {
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("users").document(userId)
-                    .get()
-                    .addOnSuccessListener(document -> {
-                        if (document.exists()) {
-                            long totalExams = document.getLong("total_exams");
-                            String totalTime = document.getString("total_time");
+//        if (userId != null) {
+//            FirebaseFirestore db = FirebaseFirestore.getInstance();
+//            db.collection("users").document(userId)
+//                    .get()
+//                    .addOnSuccessListener(document -> {
+//                        if (document.exists()) {
+//                            int totalExams = document.getLong("total_exams").intValue();
+//                            String totalTime = document.getString("total_time");
+//
+//                            totalExamNumTextView.setText(String.valueOf(totalExams));
+//                            totalTimeNumTextView.setText(totalTime);
+//                        }
+//                    });
+//        }
 
-                            totalExamNumTextView.setText(String.valueOf(totalExams));
-                            totalTimeNumTextView.setText(totalTime);
-                        }
-                    });
+        if (userId != null) {
+            userController.getCurrentUserDocument((value, error) -> {
+                if (value != null && value.exists()) {
+                    User user = value.toObject(User.class);
+                    int totalExams = user.getTotalExams();
+                    long totalTime = user.getTotalTime();
+                    totalExamNumTextView.setText(String.valueOf(totalExams));
+                    totalTimeNumTextView.setText(String.valueOf(totalTime));
+                }
+            });
         }
     }
 }
