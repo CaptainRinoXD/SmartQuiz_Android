@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     private LinearLayout floatingMenu;
     private ImageView menuButton;
+    private TextView takeTestButton;
     private boolean isMenuVisible = false;
     private UserController userController;
     private TextView totalExamNumTextView;
@@ -42,16 +43,25 @@ public class MainActivity extends AppCompatActivity {
         // Tìm view
         floatingMenu = findViewById(R.id.floating_menu);
         menuButton = findViewById(R.id.registerBtn);
+        takeTestButton = findViewById(R.id.menu_test);
 
         // Gắn sự kiện toggle menu
         menuButton.setOnClickListener(v -> {
             if (isMenuVisible) {
                 floatingMenu.setVisibility(View.GONE);
+
             } else {
                 floatingMenu.setVisibility(View.VISIBLE);
             }
             isMenuVisible = !isMenuVisible;
+
         });
+
+        takeTestButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ListTestActivity.class);
+            startActivity(intent);
+        });
+
 
         userController = new UserController();
         String userId = userController.getCurrentUserId();
@@ -59,20 +69,7 @@ public class MainActivity extends AppCompatActivity {
         totalExamNumTextView = findViewById(R.id.total_exam_num);
         totalTimeNumTextView = findViewById(R.id.total_time_num);
 
-//        if (userId != null) {
-//            FirebaseFirestore db = FirebaseFirestore.getInstance();
-//            db.collection("users").document(userId)
-//                    .get()
-//                    .addOnSuccessListener(document -> {
-//                        if (document.exists()) {
-//                            int totalExams = document.getLong("total_exams").intValue();
-//                            String totalTime = document.getString("total_time");
-//
-//                            totalExamNumTextView.setText(String.valueOf(totalExams));
-//                            totalTimeNumTextView.setText(totalTime);
-//                        }
-//                    });
-//        }
+
 
         if (userId != null) {
             userController.getCurrentUserDocument((value, error) -> {
