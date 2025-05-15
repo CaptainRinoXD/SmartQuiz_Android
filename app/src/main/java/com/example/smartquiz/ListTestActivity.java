@@ -1,5 +1,6 @@
 package com.example.smartquiz;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -9,6 +10,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import android.util.Log;
+
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -18,6 +22,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 public class ListTestActivity extends AppCompatActivity {
 
+    private LinearLayout floatingMenu;
+    private ImageView menuButton;
+    private TextView homeButton;
+
+    private boolean isMenuVisible = false;
     private ExamController examController;
     private LinearLayout topicListLayout;
     private static final String TAG = "ListTestActivity";
@@ -37,6 +46,32 @@ public class ListTestActivity extends AppCompatActivity {
         topicListLayout = findViewById(R.id.topic_list);
 
         loadExams();
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+        // Tìm view
+        floatingMenu = findViewById(R.id.floating_menu);
+        menuButton = findViewById(R.id.registerBtn);
+        homeButton = findViewById(R.id.menu_home);
+
+        // Gắn sự kiện toggle menu
+        menuButton.setOnClickListener(v -> {
+            if (isMenuVisible) {
+                floatingMenu.setVisibility(View.GONE);
+
+            } else {
+                floatingMenu.setVisibility(View.VISIBLE);
+            }
+            isMenuVisible = !isMenuVisible;
+
+        });
+        homeButton.setOnClickListener(v -> {
+            Intent intent = new Intent(ListTestActivity.this, MainActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void loadExams() {
