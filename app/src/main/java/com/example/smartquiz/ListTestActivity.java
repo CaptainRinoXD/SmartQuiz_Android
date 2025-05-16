@@ -72,6 +72,8 @@ public class ListTestActivity extends AppCompatActivity {
             Intent intent = new Intent(ListTestActivity.this, MainActivity.class);
             startActivity(intent);
         });
+
+        
     }
 
     private void loadExams() {
