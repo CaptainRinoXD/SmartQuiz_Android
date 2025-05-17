@@ -10,97 +10,6 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout3"
-        android:layout_width="413dp"
-        android:layout_height="317dp"
-        tools:layout_editor_absoluteY="446dp">
-
-        <ImageView
-            android:id="@+id/imageButton3"
-            android:layout_width="201dp"
-            android:layout_height="272dp"
-            android:layout_marginStart="208dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.644"
-            app:srcCompat="@drawable/box" />
-
-        <ImageView
-            android:id="@+id/imageButton2"
-            android:layout_width="201dp"
-            android:layout_height="272dp"
-            android:layout_marginStart="4dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.644"
-            app:srcCompat="@drawable/box" />
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Số bài"
-            android:textColor="#43558C"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/imageButton2"
-            app:layout_constraintEnd_toEndOf="@+id/imageButton2"
-            app:layout_constraintHorizontal_bias="0.468"
-            app:layout_constraintStart_toStartOf="@+id/imageButton2"
-            app:layout_constraintTop_toTopOf="@+id/imageButton2"
-            app:layout_constraintVertical_bias="0.276" />
-
-        <TextView
-            android:id="@+id/total_exam_num"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="null"
-            android:textColor="#43558C"
-            android:textSize="48sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/imageButton2"
-            app:layout_constraintEnd_toEndOf="@+id/imageButton2"
-            app:layout_constraintHorizontal_bias="0.468"
-            app:layout_constraintStart_toStartOf="@+id/imageButton2"
-            app:layout_constraintTop_toBottomOf="@+id/textView4"
-            app:layout_constraintVertical_bias="0.189" />
-
-        <TextView
-            android:id="@+id/total_time_num"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="null"
-            android:textAlignment="center"
-            android:textColor="#43558C"
-            android:textSize="48sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/imageButton3"
-            app:layout_constraintEnd_toEndOf="@+id/imageButton3"
-            app:layout_constraintHorizontal_bias="0.589"
-            app:layout_constraintStart_toStartOf="@+id/imageButton3"
-            app:layout_constraintTop_toBottomOf="@+id/textView10"
-            app:layout_constraintVertical_bias="0.192" />
-
-        <TextView
-            android:id="@+id/textView10"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Số giờ"
-            android:textColor="#43558C"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/imageButton3"
-            app:layout_constraintEnd_toEndOf="@+id/imageButton3"
-            app:layout_constraintHorizontal_bias="0.515"
-            app:layout_constraintStart_toStartOf="@+id/imageButton3"
-            app:layout_constraintTop_toTopOf="@+id/imageButton3"
-            app:layout_constraintVertical_bias="0.279" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="94dp"
@@ -336,10 +245,9 @@
 
         <GridLayout
             android:id="@+id/heatmapGrid2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="393dp"
+            android:layout_height="366dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="276dp"
             android:layout_marginEnd="16dp"
             android:alignmentMode="alignMargins"
             android:columnCount="7"
@@ -349,7 +257,101 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/titleTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout3"
+            android:layout_width="413dp"
+            android:layout_height="317dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/heatmapGrid2">
+
+            <ImageView
+                android:id="@+id/imageButton3"
+                android:layout_width="201dp"
+                android:layout_height="272dp"
+                android:layout_marginStart="208dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.644"
+                app:srcCompat="@drawable/box" />
+
+            <ImageView
+                android:id="@+id/imageButton2"
+                android:layout_width="201dp"
+                android:layout_height="272dp"
+                android:layout_marginStart="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.644"
+                app:srcCompat="@drawable/box" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Số bài"
+                android:textColor="#43558C"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/imageButton2"
+                app:layout_constraintEnd_toEndOf="@+id/imageButton2"
+                app:layout_constraintHorizontal_bias="0.468"
+                app:layout_constraintStart_toStartOf="@+id/imageButton2"
+                app:layout_constraintTop_toTopOf="@+id/imageButton2"
+                app:layout_constraintVertical_bias="0.276" />
+
+            <TextView
+                android:id="@+id/total_exam_num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="null"
+                android:textColor="#43558C"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/imageButton2"
+                app:layout_constraintEnd_toEndOf="@+id/imageButton2"
+                app:layout_constraintHorizontal_bias="0.468"
+                app:layout_constraintStart_toStartOf="@+id/imageButton2"
+                app:layout_constraintTop_toBottomOf="@+id/textView4"
+                app:layout_constraintVertical_bias="0.189" />
+
+            <TextView
+                android:id="@+id/total_time_num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="null"
+                android:textAlignment="center"
+                android:textColor="#43558C"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/imageButton3"
+                app:layout_constraintEnd_toEndOf="@+id/imageButton3"
+                app:layout_constraintHorizontal_bias="0.589"
+                app:layout_constraintStart_toStartOf="@+id/imageButton3"
+                app:layout_constraintTop_toBottomOf="@+id/textView10"
+                app:layout_constraintVertical_bias="0.192" />
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Số giờ"
+                android:textColor="#43558C"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/imageButton3"
+                app:layout_constraintEnd_toEndOf="@+id/imageButton3"
+                app:layout_constraintHorizontal_bias="0.515"
+                app:layout_constraintStart_toStartOf="@+id/imageButton3"
+                app:layout_constraintTop_toTopOf="@+id/imageButton3"
+                app:layout_constraintVertical_bias="0.279" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
