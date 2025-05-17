@@ -1,5 +1,6 @@
 package com.example.smartquiz;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -46,7 +47,11 @@ public class ListTestActivity extends AppCompatActivity {
                 return;
             }
             if (value != null) {
-                topicListLayout.removeAllViews(); //clear previous views
+                topicListLayout.removeAllViews();
+                Log.d(TAG, "Fetched " + value.size() + " documents.");
+                if (value.isEmpty()) {
+                    Log.d(TAG, "No exam documents found.");
+                }
                 for (DocumentSnapshot document : value.getDocuments()) {
                     Exam exam = document.toObject(Exam.class);
                     String examTitle;
@@ -58,7 +63,7 @@ public class ListTestActivity extends AppCompatActivity {
                     }
 
                     TextView examTextView = new TextView(this);
-                    examTextView.setText("Exam List");
+                    examTextView.setText(examTitle);
 
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
@@ -77,9 +82,9 @@ public class ListTestActivity extends AppCompatActivity {
                     examTextView.setOnClickListener(v -> {
                         Log.d(TAG, "Clicked on exam: " + document.getId() + ", Title: " + examTitle);
                         // TODO: Navigate to exam details activity or start the quiz
-                        // Intent intent = new Intent(ListTestActivity.this, ExamDetailActivity.class);
-                        // intent.putExtra("EXAM_ID", document.getId());
-                        // startActivity(intent);
+                        Intent intent = new Intent(ListTestActivity.this, ExamDetailActivity.class);
+                        intent.putExtra("EXAM_ID", document.getId());
+                        startActivity(intent);
                     });
 
                     topicListLayout.addView(examTextView);

@@ -13,6 +13,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.smartquiz.Controller.SubmissionController;
 import com.example.smartquiz.Controller.UserController;
 import com.example.smartquiz.Model.User;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -72,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (userId != null) {
+            SubmissionController submissionController = new SubmissionController();
+            submissionController.getSubmissionCountForStudent((value) -> {});
+            submissionController.getTotalDurationForStudent((value) -> {});
             userController.getCurrentUserDocument((value, error) -> {
                 if (value != null && value.exists()) {
                     User user = value.toObject(User.class);

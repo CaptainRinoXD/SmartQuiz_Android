@@ -1,5 +1,7 @@
 package com.example.smartquiz.Controller;
 
+import android.util.Log;
+
 import com.example.smartquiz.Model.Exam;
 import com.example.smartquiz.Model.Question;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -63,5 +65,42 @@ public class ExamController extends BaseController {
 
     public void fetchExamQuestions(String examId, EventListener<QuerySnapshot> listener) {
         db.collection("exams").document(examId).collection("questions").addSnapshotListener(listener);
+    }
+
+    public void fetchExamDetails(String examId, EventListener<DocumentSnapshot> listener) {
+        db.collection("exams").document(examId).addSnapshotListener(listener);
+    }
+
+    public interface QuestionCountCallback {
+        void onCountFetched(int count);
+
+        void onError(Exception e);
+    }
+
+    public void fetchQuestionCount(String examId, QuestionCountCallback callback) {
+        db.collection("exams").document(examId).collection("questions")
+            .addSnapshotListener((querySnapshot, error) -> {
+                if (error != null) {
+                    Log.e("ExamController", "Error fetching question count for exam: " + examId, error);
+                    if (callback != null) {
+                        callback.onError(error);
+                    }
+                    return;
+                }
+
+                if (querySnapshot != null) {
+                    int count = querySnapshot.size();
+                    Log.d("ExamController", "Fetched question count for exam " + examId + ": " + count);
+                    if (callback != null) {
+                        callback.onCountFetched(count);
+                    }
+                } else {
+                    // This case is less likely with addSnapshotListener unless there's an error
+                    Log.w("ExamController", "QuerySnapshot is null when fetching count for exam: " + examId);
+                    if (callback != null) {
+                        callback.onCountFetched(0); // Report 0 count for null snapshot
+                    }
+                }
+            });
     }
 }

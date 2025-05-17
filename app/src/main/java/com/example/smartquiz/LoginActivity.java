@@ -14,11 +14,13 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.smartquiz.Controller.UserController;
+import com.example.smartquiz.Util.LoadingDialogFragment;
 import com.google.firebase.auth.FirebaseUser;
 
 
 public class LoginActivity extends AppCompatActivity {
-
+    private LoadingDialogFragment loadingDialog;
+    private static final String TAG = "LoginActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,8 +48,10 @@ public class LoginActivity extends AppCompatActivity {
                  Toast.makeText(LoginActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                  return;
              }
+             showLoading(true);
 
              userController.signInWithEmailPassword(email, password, task -> {
+                 showLoading(false);
                  if (task.isSuccessful()) {
                     Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -75,5 +79,22 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         
+    }
+
+    private void showLoading(boolean show) {
+        if (show) {
+            if (loadingDialog == null || !loadingDialog.isVisible()) {
+                loadingDialog = LoadingDialogFragment.newInstance();
+                // Ensure LoadingDialogFragment.TAG is defined in LoadingDialogFragment
+                loadingDialog.show(getSupportFragmentManager(), LoadingDialogFragment.TAG);
+            }
+
+        } else {
+            if (loadingDialog != null && loadingDialog.isVisible()) {
+                loadingDialog.dismissAllowingStateLoss();
+            }
+            loadingDialog = null; // Clear reference
+
+        }
     }
 }

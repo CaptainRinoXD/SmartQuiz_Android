@@ -10,15 +10,16 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:indeterminate="true" />
+
     <TextView
         android:id="@+id/dialog_loading_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="50dp"
         android:text="Loading..."
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
+        android:textColor="@color/teal_200"
+        android:textSize="20sp"
         android:visibility="visible" />
 
 </FrameLayout>

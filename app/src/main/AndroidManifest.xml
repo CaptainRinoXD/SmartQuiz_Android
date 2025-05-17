@@ -13,6 +13,12 @@
         android:theme="@style/Theme.SmartQuiz"
         tools:targetApi="31">
         <activity
+            android:name=".takeTestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ExamDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".ListTestActivity"
             android:exported="false" />
         <activity
