@@ -2,12 +2,18 @@ package com.example.smartquiz.Model;
 
 public class Answer {
     public String text;
-    public boolean isCorrect;
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
 
     public Answer() {}
 
-    public Answer(String text, boolean isCorrect) {
+    public Answer(String text) {
         this.text = text;
-        this.isCorrect = isCorrect;
     }
 }
