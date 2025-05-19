@@ -223,41 +223,55 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="46dp">
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="-42dp">
 
         <!-- Tiêu đề -->
 
         <!-- Heatmap GridLayout -->
 
         <!-- Ghi chú dưới cùng -->
+
+        <!--        <GridLayout-->
+        <!--            android:id="@+id/heatmapGrid2"-->
+        <!--            android:layout_width="393dp"-->
+        <!--            android:layout_height="366dp"-->
+        <!--            android:layout_marginStart="16dp"-->
+        <!--            android:layout_marginEnd="16dp"-->
+        <!--            android:alignmentMode="alignMargins"-->
+        <!--            android:columnCount="7"-->
+        <!--            android:padding="8dp"-->
+        <!--            android:rowCount="5"-->
+        <!--            android:useDefaultMargins="true"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintHorizontal_bias="0.0"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toBottomOf="@+id/titleTextView" />-->
+
         <TextView
             android:id="@+id/titleTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="112dp"
-            android:text="HeatMap"
+            android:layout_marginTop="100dp"
+            android:text="Thông kê số bài"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.501"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <GridLayout
-            android:id="@+id/heatmapGrid2"
-            android:layout_width="393dp"
-            android:layout_height="366dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:alignmentMode="alignMargins"
-            android:columnCount="7"
-            android:padding="8dp"
-            android:rowCount="5"
-            android:useDefaultMargins="true"
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lineChart"
+            android:layout_width="412dp"
+            android:layout_height="424dp"
+            app:layout_constraintBottom_toTopOf="@+id/constraintLayout3"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
+            app:layout_constraintTop_toTopOf="@+id/titleTextView"
+            app:layout_constraintVertical_bias="0.25" />
+
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout3"
@@ -265,8 +279,9 @@
             android:layout_height="317dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/heatmapGrid2">
+            app:layout_constraintTop_toBottomOf="@+id/lineChart">
 
             <ImageView
                 android:id="@+id/imageButton3"
