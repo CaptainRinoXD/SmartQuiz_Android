@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.smartquiz.Controller.ExamController;
 import com.example.smartquiz.Model.Answer;
+import com.example.smartquiz.Model.Exam;
 import com.example.smartquiz.Model.Question;
 import com.google.firebase.firestore.DocumentSnapshot;
 
@@ -63,6 +65,7 @@ public class takeTestActivity extends AppCompatActivity {
             examId = extras.getString("examId");
             Log.d(TAG, "Received exam id: " + examId);
             fetchExamQuesion(examId);
+            fetchExamDetail(examId);
         } else {
             Log.d(TAG, "No exam id received.");
         }
@@ -95,22 +98,50 @@ public class takeTestActivity extends AppCompatActivity {
         });
     }
 
+    private void fetchExamDetail(String examId) {
+        examController = new ExamController();
+        examController.fetchExamDetails(examId, (value, error) -> {
+            if (error != null || value == null) {
+                Log.w(TAG, "Listen failed:", error);
+                return;
+            }
+            Exam exam = value.toObject(Exam.class);
+            if (exam != null) {
+                int durationInMinutes = exam.getDuration();
+                int durationInMillis = durationInMinutes * 60 * 1000;
+
+                new CountDownTimer(durationInMillis, 1000) {
+                    public void onTick(long millisUntilFinished) {
+                        long secondsRemaining = millisUntilFinished / 1000;
+                        long minutes = secondsRemaining / 60;
+                        long seconds = secondsRemaining % 60;
+                        String formattedTime = String.format("%02d:%02d", minutes, seconds);
+                        textViewDuration.setText(formattedTime);
+                    }
+                    public void onFinish() {
+                        textViewDuration.setText("Time's up!");
+                    }
+                }.start();
+            }
+        });
+    }
+
     private void addQuestionToUI(Question question, int questionNumber) {
         // Create TextView for the question number and text
         TextView questionTextView = new TextView(this);
         LinearLayout.LayoutParams questionParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-        questionParams.setMargins(16, 32, 16, 8); // Add some margin (left, top, right, bottom)
+        questionParams.setMargins(16, 32, 16, 8);
         questionTextView.setLayoutParams(questionParams);
         questionTextView.setText("Question " + questionNumber + ": " + question.getQuestionText());
         questionTextView.setTextSize(18);
         questionTextView.setTypeface(null, Typeface.BOLD);
-        questionTextView.setTextColor(Color.BLACK); // Or your desired color
+        questionTextView.setTextColor(Color.BLACK);
 
         questionsLinearLayout.addView(questionTextView);
 
-        // Create RadioGroup for answers (assuming single choice)
+
         RadioGroup answerRadioGroup = new RadioGroup(this);
         LinearLayout.LayoutParams radioGroupParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
