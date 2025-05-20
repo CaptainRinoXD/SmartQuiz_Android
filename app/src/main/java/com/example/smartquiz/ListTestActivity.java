@@ -23,11 +23,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 public class ListTestActivity extends AppCompatActivity {
 
-    private LinearLayout floatingMenu;
-    private ImageView menuButton;
-    private TextView homeButton;
-
-    private boolean isMenuVisible = false;
+    //private  Header_Controller headerController;
     private ExamController examController;
     private LinearLayout topicListLayout;
     private static final String TAG = "ListTestActivity";
@@ -57,28 +53,7 @@ public class ListTestActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        // Tìm view
-        floatingMenu = findViewById(R.id.floating_menu);
-        menuButton = findViewById(R.id.registerBtn);
-        homeButton = findViewById(R.id.menu_home);
-
-        // Gắn sự kiện toggle menu
-        menuButton.setOnClickListener(v -> {
-            if (isMenuVisible) {
-                floatingMenu.setVisibility(View.GONE);
-
-            } else {
-                floatingMenu.setVisibility(View.VISIBLE);
-            }
-            isMenuVisible = !isMenuVisible;
-
-        });
-        homeButton.setOnClickListener(v -> {
-            Intent intent = new Intent(ListTestActivity.this, MainActivity.class);
-            startActivity(intent);
-        });
-
-        
+        Header_Controller.setup(this);
     }
 
     private void loadExams() {
