@@ -1,5 +1,8 @@
 package com.example.smartquiz.Controller;
 
+import android.util.Log;
+
+import com.example.smartquiz.Model.Question;
 import com.example.smartquiz.Model.Submission;
 import com.example.smartquiz.Model.SubmissionAnswer;
 import com.example.smartquiz.Model.User;
@@ -13,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SubmissionController extends BaseController {
+    private final static String TAG = "SubmissionController";
     public void submitExam(Submission submission, int duration, OnCompleteListener<Void> listener) {
         submission.setStudentId(getCurrentUserId());
         submission.setSubmittedAt(new Date());
@@ -25,29 +29,33 @@ public class SubmissionController extends BaseController {
                 .get()
                 .addOnSuccessListener(questionSnapshots -> {
                     int correctCount = 0;
-
+                    int numOfQuestion = questionSnapshots.size();
+                    float pointPerQuestion = 10.0f / numOfQuestion;
                     // Duyệt từng câu trả lời học sinh đã chọn
-                    for (SubmissionAnswer answer : submission.getAnswers()) {
+                    for (SubmissionAnswer submissionAnswer : submission.getAnswers()) {
                         // Tìm câu hỏi tương ứng trong danh sách
                         for (DocumentSnapshot qSnap : questionSnapshots) {
-                            if (qSnap.getId().equals(answer.getQuestionId())) {
-                                // Lấy danh sách đáp án từ Firestore
-                                List<Map<String, Object>> answersList =
-                                        (List<Map<String, Object>>) qSnap.get("answers");
+                            if (qSnap.getId().equals(submissionAnswer.getQuestionId())) {
+                                // // Lấy danh sách đáp án từ Firestore
+                                // List<Map<String, Object>> answersList =
+                                //         (List<Map<String, Object>>) qSnap.get("answers");
 
-                                int correctIndex = -1;
-                                for (int i = 0; i < answersList.size(); i++) {
-                                    Map<String, Object> ans = answersList.get(i);
-                                    if ((boolean) ans.get("isCorrect")) {
-                                        correctIndex = i;
-                                        break;
-                                    }
-                                }
+                                // int correctIndex = -1;
+                                // for (int i = 0; i < answersList.size(); i++) {
+                                //     Map<String, Object> ans = answersList.get(i);
+                                //     if ((boolean) ans.get("isCorrect")) {
+                                //         correctIndex = i;
+                                //         break;
+                                //     }
+                                // }
 
-                                // Gán kết quả vào answer
-                                answer.setCorrectAnswerIndex(correctIndex);
-                                boolean isCorrect = (answer.getSelectedAnswerIndex() == correctIndex);
-                                answer.setIsCorrect(isCorrect);
+                                Question currQuestion = qSnap.toObject(Question.class);
+                                int correctIndex = currQuestion.getCorrectAnswerIndex();
+                                Log.d(TAG, "Correct Answer Index: " + correctIndex);
+                                // Gán kết quả từ Exam Question vào submissionAnswer
+                                submissionAnswer.setCorrectAnswerIndex(correctIndex);
+                                boolean isCorrect = (submissionAnswer.getSelectedAnswerIndex() == correctIndex);
+                                submissionAnswer.setIsCorrect(isCorrect);
                                 if (isCorrect) correctCount++;
                                 break;
                             }
@@ -55,7 +63,7 @@ public class SubmissionController extends BaseController {
                     }
 
                     // Cập nhật điểm
-                    submission.setScore(correctCount);
+                    submission.setScore(correctCount*pointPerQuestion);
 
                     // Lưu submission vào Firestore
                     String submissionId = db.collection("submissions").document().getId();

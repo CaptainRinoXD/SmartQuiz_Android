@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                     testData.put("2025-06-19", 6L);
                     testData.put("2025-07-19", 6L);
                     testData.put("2025-08-19", 6L);
-                    testData.put("2025-09-19", 6L);
+                    testData.put("2025-09-19", 10L);
                     testData.put("2025-10-19", 6L);
                     testData.put("2025-11-19", 6L);
 

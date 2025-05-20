@@ -7,7 +7,7 @@ public class Submission {
     private String examId;
     private String studentId;
     private Date submittedAt;
-    private int score;
+    private float score;
     private List<SubmissionAnswer> answers;
     private int duration;
 
@@ -40,11 +40,11 @@ public class Submission {
         this.submittedAt = submittedAt;
     }
 
-    public int getScore() {
+    public float getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(float score) {
         this.score = score;
     }
 
@@ -64,7 +64,7 @@ public class Submission {
         this.duration = duration;
     }
 
-    public Submission(String examId, String studentId, Date submittedAt, int score, List<SubmissionAnswer> answers,
+    public Submission(String examId, String studentId, Date submittedAt, float score, List<SubmissionAnswer> answers,
             int duration) {
         this.examId = examId;
         this.studentId = studentId;

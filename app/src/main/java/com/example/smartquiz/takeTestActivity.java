@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBar;
@@ -22,9 +23,12 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.smartquiz.Controller.ExamController;
+import com.example.smartquiz.Controller.SubmissionController;
 import com.example.smartquiz.Model.Answer;
 import com.example.smartquiz.Model.Exam;
 import com.example.smartquiz.Model.Question;
+import com.example.smartquiz.Model.Submission;
+import com.example.smartquiz.Model.SubmissionAnswer;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
@@ -69,6 +73,10 @@ public class takeTestActivity extends AppCompatActivity {
         } else {
             Log.d(TAG, "No exam id received.");
         }
+
+        submitButton.setOnClickListener(view -> {
+            submissionExam(examId);
+        });
     }
 
     private void fetchExamQuesion(String examId) {
@@ -91,6 +99,8 @@ public class takeTestActivity extends AppCompatActivity {
                     Question question = document.toObject(Question.class);
                     if (question != null) {
                         questionList.add(question);
+                        String questionId = document.getId();
+                        question.setId(questionId);
                         addQuestionToUI(question, questionList.size());
                     }
                 }
@@ -109,19 +119,78 @@ public class takeTestActivity extends AppCompatActivity {
             if (exam != null) {
                 int durationInMinutes = exam.getDuration();
                 int durationInMillis = durationInMinutes * 60 * 1000;
+                timerDuration(durationInMillis, examId);
+            }
+        });
+    }
 
-                new CountDownTimer(durationInMillis, 1000) {
-                    public void onTick(long millisUntilFinished) {
-                        long secondsRemaining = millisUntilFinished / 1000;
-                        long minutes = secondsRemaining / 60;
-                        long seconds = secondsRemaining % 60;
-                        String formattedTime = String.format("%02d:%02d", minutes, seconds);
-                        textViewDuration.setText(formattedTime);
-                    }
-                    public void onFinish() {
-                        textViewDuration.setText("Time's up!");
-                    }
-                }.start();
+    private void timerDuration(int durationInMillis , String examId) {
+        new CountDownTimer(durationInMillis, 1000) {
+            public void onTick(long millisUntilFinished) {
+                long secondsRemaining = millisUntilFinished / 1000;
+                long minutes = secondsRemaining / 60;
+                long seconds = secondsRemaining % 60;
+                String formattedTime = String.format("%02d:%02d", minutes, seconds);
+                textViewDuration.setText(formattedTime);
+            }
+            public void onFinish() {
+                textViewDuration.setText("Finish");
+                submissionExam(examId);
+            }
+        }.start();
+    }
+
+    private void submissionExam(String examId ) {
+        Submission submission = new Submission();
+        submission.setExamId(examId);
+        List<SubmissionAnswer> answers = new ArrayList<>();
+
+        for (int i = 0; i < questionsLinearLayout.getChildCount(); i++) {
+            View child = questionsLinearLayout.getChildAt(i);
+
+            if (child instanceof RadioGroup) {
+                RadioGroup radioGroup = (RadioGroup) child;
+                String questionId = (String) radioGroup.getTag(); //get question id from tag
+                Log.d(TAG, "Question ID from radioTag: " + questionId);
+                int selectedRadioButtonId = radioGroup.getCheckedRadioButtonId();
+
+                if (selectedRadioButtonId != -1) {
+                    RadioButton selectedRadioButton = findViewById(selectedRadioButtonId);
+                    SubmissionAnswer submissionAnswer = new SubmissionAnswer();
+                    submissionAnswer.setQuestionId(questionId); //setting the same id for subAnswers
+                    
+                    //get the original index for the selected answer
+                    int selectedAnswerOriginalIndex = (int) selectedRadioButton.getTag();
+                    submissionAnswer.setSelectedAnswerIndex(selectedAnswerOriginalIndex);
+                    answers.add(submissionAnswer);
+
+                } else {
+                    SubmissionAnswer submissionAnswer = new SubmissionAnswer(); 
+                    submissionAnswer.setQuestionId(questionId);
+                    submissionAnswer.setSelectedAnswerIndex(-1); // Indicate no answer selected
+                    answers.add(submissionAnswer);
+                }
+
+            }
+        }
+        submission.setAnswers(answers);
+        String durationString = textViewDuration.getText().toString();
+        int durationInMinutes = 0;
+        if (!durationString.equals("Finish")) {
+            durationInMinutes = Integer.parseInt(durationString.split(":")[0]);
+            //int durationInMillis = durationInMinutes * 60 * 1000;
+        }
+
+        SubmissionController submissionController = new SubmissionController();
+        submissionController.submitExam(submission, durationInMinutes, task -> {
+            if (task.isSuccessful()) {
+                Log.d(TAG, "Exam submitted successfully");
+                Toast.makeText(takeTestActivity.this, "Exam submitted successfully", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(takeTestActivity.this, MainActivity.class);
+                startActivity(intent);
+            } else {
+                Log.w(TAG, "Error submitting exam", task.getException());
+                Toast.makeText(takeTestActivity.this, "Error submitting exam: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -143,6 +212,9 @@ public class takeTestActivity extends AppCompatActivity {
 
 
         RadioGroup answerRadioGroup = new RadioGroup(this);
+        // set tag for each question to setId for answerSubmission (same id for evaluation) check SubmissionController for more infor
+        answerRadioGroup.setTag(question.getId());
+
         LinearLayout.LayoutParams radioGroupParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
