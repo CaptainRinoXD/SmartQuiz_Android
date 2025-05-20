@@ -37,10 +37,8 @@ import java.util.TreeMap;
 
 public class MainActivity extends AppCompatActivity {
 
-    private LinearLayout floatingMenu;
-    private ImageView menuButton;
-    private TextView takeTestButton;
-    private boolean isMenuVisible = false;
+
+   // private  Header_Controller headerController;
     private UserController userController;
 
     private TextView totalExamNumTextView;
@@ -62,24 +60,10 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        floatingMenu = findViewById(R.id.floating_menu);
-        menuButton = findViewById(R.id.registerBtn);
-        takeTestButton = findViewById(R.id.menu_test);
+
         lineChart = findViewById(R.id.lineChart);  // lấy view lineChart
 
-        menuButton.setOnClickListener(v -> {
-            if (isMenuVisible) {
-                floatingMenu.setVisibility(View.GONE);
-            } else {
-                floatingMenu.setVisibility(View.VISIBLE);
-            }
-            isMenuVisible = !isMenuVisible;
-        });
-
-        takeTestButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, ListTestActivity.class);
-            startActivity(intent);
-        });
+        Header_Controller.setup(this);
 
         userController = new UserController();
         String userId = userController.getCurrentUserId();
