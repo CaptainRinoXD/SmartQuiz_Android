@@ -1,7 +1,9 @@
 package com.example.smartquiz;
 
+import android.accessibilityservice.GestureDescription;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -14,7 +16,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.smartquiz.Controller.UserController;
+import com.example.smartquiz.Model.User;
 import com.example.smartquiz.Util.LoadingDialogFragment;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseUser;
 
 
@@ -54,16 +59,7 @@ public class LoginActivity extends AppCompatActivity {
                  showLoading(false);
                  if (task.isSuccessful()) {
                     Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    FirebaseUser user = task.getResult().getUser();
-                    if (user != null) {
-                        intent.putExtra("userId", user.getUid());
-                        intent.putExtra("userEmail", user.getEmail());
-                        intent.putExtra("userName", user.getDisplayName());
-                    }
-                    startActivity(intent);
-                    finish();
+                    checkRole();
                  } else {
                     Toast.makeText(LoginActivity.this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                  }
@@ -79,6 +75,37 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         
+    }
+
+    private void checkRole() {
+        UserController userController = new UserController();
+        userController.getCurrentUserDocument((value, error) -> {
+            if(error != null) {
+                Toast.makeText(LoginActivity.this, "Error getting user document: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (value != null ) {
+                User user = value.toObject(User.class);
+                String userRole = user.getRole();
+                if (userRole == null) {
+                    Toast.makeText(LoginActivity.this, "Tạo lại tài khoản đi lỗi rồi", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Log.d(TAG, "User Role: " + userRole);
+                if (userRole.equals("Student")) {
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
+                } else if (userRole.equals("Teacher")) {
+//                    Intent intent = new Intent(LoginActivity.this, TeacherMainActivity.class);
+//                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    startActivity(intent);
+//                    finish();
+                }
+
+            }
+        });
     }
 
     private void showLoading(boolean show) {

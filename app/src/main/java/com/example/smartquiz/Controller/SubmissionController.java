@@ -17,6 +17,7 @@ import java.util.Map;
 
 public class SubmissionController extends BaseController {
     private final static String TAG = "SubmissionController";
+
     public void submitExam(Submission submission, int duration, OnCompleteListener<Void> listener) {
         submission.setStudentId(getCurrentUserId());
         submission.setSubmittedAt(new Date());
@@ -38,15 +39,15 @@ public class SubmissionController extends BaseController {
                             if (qSnap.getId().equals(submissionAnswer.getQuestionId())) {
                                 // // Lấy danh sách đáp án từ Firestore
                                 // List<Map<String, Object>> answersList =
-                                //         (List<Map<String, Object>>) qSnap.get("answers");
+                                // (List<Map<String, Object>>) qSnap.get("answers");
 
                                 // int correctIndex = -1;
                                 // for (int i = 0; i < answersList.size(); i++) {
-                                //     Map<String, Object> ans = answersList.get(i);
-                                //     if ((boolean) ans.get("isCorrect")) {
-                                //         correctIndex = i;
-                                //         break;
-                                //     }
+                                // Map<String, Object> ans = answersList.get(i);
+                                // if ((boolean) ans.get("isCorrect")) {
+                                // correctIndex = i;
+                                // break;
+                                // }
                                 // }
 
                                 Question currQuestion = qSnap.toObject(Question.class);
@@ -56,14 +57,15 @@ public class SubmissionController extends BaseController {
                                 submissionAnswer.setCorrectAnswerIndex(correctIndex);
                                 boolean isCorrect = (submissionAnswer.getSelectedAnswerIndex() == correctIndex);
                                 submissionAnswer.setIsCorrect(isCorrect);
-                                if (isCorrect) correctCount++;
+                                if (isCorrect)
+                                    correctCount++;
                                 break;
                             }
                         }
                     }
 
                     // Cập nhật điểm
-                    submission.setScore(correctCount*pointPerQuestion);
+                    submission.setScore(correctCount * pointPerQuestion);
 
                     // Lưu submission vào Firestore
                     String submissionId = db.collection("submissions").document().getId();
@@ -88,7 +90,7 @@ public class SubmissionController extends BaseController {
                 });
     }
 
-    public void getAllSubmissionsForStudent(OnSuccessListener<List<Submission>> listener) {
+    public void getAllSubmissionsFromStudent(OnSuccessListener<List<Submission>> listener) {
         String studentId = getCurrentUserId();
 
         db.collection("submissions")
@@ -119,9 +121,17 @@ public class SubmissionController extends BaseController {
                     listener.onSuccess(totalDuration);
 
                     UserController userController = new UserController();
-                    User currentUser = new User();
-                    currentUser.setTotalTime(totalDuration);
-                    userController.updateUserDocument(currentUser, null);
+                    final int tDuration = totalDuration;
+                    userController.getCurrentUserDocument((value, error) -> {
+                        if (error != null) {
+                            return;
+                        }
+                        if (value != null ) {
+                            User currentUser = value.toObject(User.class);
+                            currentUser.setTotalTime(tDuration);
+                            userController.updateUserDocument(currentUser, null);
+                        }
+                    });
 
                 });
     }
@@ -134,11 +144,19 @@ public class SubmissionController extends BaseController {
                 .addOnSuccessListener(querySnapshot -> {
                     int submissionCount = querySnapshot.size();
                     listener.onSuccess(submissionCount);
-
                     UserController userController = new UserController();
-                    User currentUser = new User();
-                    currentUser.setTotalExams(submissionCount);
-                    userController.updateUserDocument(currentUser, null);
+
+                    userController.getCurrentUserDocument((value,error)-> {
+                        if (error != null) {
+                            return;
+                        }
+                        if (value != null ) {
+                            User currentUser = value.toObject(User.class);
+                            currentUser.setTotalExams(submissionCount);
+                            userController.updateUserDocument(currentUser, null);
+                        }
+                    });
+
                 });
     }
 
