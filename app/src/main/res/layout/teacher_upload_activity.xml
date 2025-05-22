@@ -26,7 +26,7 @@
             android:layout_width="224dp"
             android:layout_height="122dp"
             android:padding="8dp"
-            android:text="Trang chủ"
+            android:text="Upload đề"
             android:textSize="18sp" />
 
         <TextView
@@ -34,7 +34,7 @@
             android:layout_width="223dp"
             android:layout_height="111dp"
             android:padding="8dp"
-            android:text="Quản lý đề"
+            android:text="Sửa đề"
             android:textSize="18sp" />
 
         <TextView
@@ -42,7 +42,7 @@
             android:layout_width="222dp"
             android:layout_height="145dp"
             android:padding="8dp"
-            android:text="Điểm số trung bình"
+            android:text="Tạo đề"
             android:textSize="18sp" />
 
     </LinearLayout>
