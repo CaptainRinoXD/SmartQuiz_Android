@@ -2,6 +2,7 @@ package com.example.smartquiz;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,12 +37,12 @@ public class Header_Controller {
             userController.getCurrentUserDocument((value, error) -> {
                 if (value != null && value.exists()) {
                     User user = value.toObject(User.class);
-                    if (user != null && user.getName() != null) {
-                        userName.setText(user.getName()); // ✅ dòng đúng
-                    }
+                    Log.d("DEBUG_TAG", "User ID: " + userId);
+
+                    userName.setText(user.getName()); // ✅ dòng đúng
+
                 }
             });
-
 
         }
 
@@ -56,16 +57,20 @@ public class Header_Controller {
         });
         homeButton.setOnClickListener(v -> {
             Intent intent = new Intent(activity, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             activity.startActivity(intent);
         });
 
+
         takeTestButton.setOnClickListener(v -> {
             Intent intent = new Intent(activity, ListTestActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             activity.startActivity(intent);
         });
 
         answerButton.setOnClickListener(v->{
             Intent intent = new Intent(activity, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             activity.startActivity(intent);
         });
 
