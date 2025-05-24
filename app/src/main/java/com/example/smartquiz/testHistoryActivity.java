@@ -1,6 +1,8 @@
 package com.example.smartquiz;
 
 import android.os.Bundle;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBar;
@@ -17,6 +19,7 @@ import com.example.smartquiz.Controller.UserController;
 import com.example.smartquiz.Model.User;
 
 public class testHistoryActivity extends AppCompatActivity {
+    private LinearLayout topicListLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,13 +34,11 @@ public class testHistoryActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        Header_Controller.setup(this);
+        topicListLayout = findViewById(R.id.topic_list);
         fetchUserSubmission();
 
     }
-
-
-
 
     private void fetchUserSubmission() {
         SubmissionController sbController = new SubmissionController();
@@ -50,11 +51,35 @@ public class testHistoryActivity extends AppCompatActivity {
                         if(value != null && value.exists()) {
                             Exam exam = value.toObject(Exam.class);
                             String examTitle = exam.getTitle();
+                            TextView examTextView = new TextView(this);
+                            examTextView.setText(examTitle);
+
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                            int marginVerticalPx = dpToPx(4);
+                            params.setMargins(0, marginVerticalPx, 0, marginVerticalPx);
+                            examTextView.setLayoutParams(params);
+
+                            examTextView.setBackgroundResource(R.drawable.white_box);
+
+                            int paddingPx = dpToPx(16);
+                            examTextView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+                            topicListLayout.addView(examTextView);
                         }
+
+
                     });
                 }
             }
         });
     }
+    
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round((float) dp * density);
+    }
+
 }
 

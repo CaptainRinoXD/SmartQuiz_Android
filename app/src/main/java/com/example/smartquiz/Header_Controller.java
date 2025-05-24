@@ -69,7 +69,7 @@ public class Header_Controller {
         });
 
         answerButton.setOnClickListener(v->{
-            Intent intent = new Intent(activity, MainActivity.class);
+            Intent intent = new Intent(activity, testHistoryActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             activity.startActivity(intent);
         });
