@@ -6,6 +6,47 @@
     android:layout_height="match_parent"
     android:background="@color/light_blue">
 
+    <LinearLayout
+        android:id="@+id/floating_menu"
+        android:layout_width="385dp"
+        android:layout_height="690dp"
+        android:layout_margin="16dp"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/white_box"
+        android:elevation="8dp"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/constraintLayout">
+
+        <TextView
+            android:id="@+id/menu_home"
+            android:layout_width="224dp"
+            android:layout_height="122dp"
+            android:padding="8dp"
+            android:text="Trang chủ"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/menu_test"
+            android:layout_width="223dp"
+            android:layout_height="111dp"
+            android:padding="8dp"
+            android:text="Làm bài"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/menu_answer"
+            android:layout_width="222dp"
+            android:layout_height="145dp"
+            android:padding="8dp"
+            android:text="Xem đáp án"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="406dp"
