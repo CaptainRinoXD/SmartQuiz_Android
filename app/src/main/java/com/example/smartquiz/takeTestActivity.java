@@ -29,6 +29,7 @@ import com.example.smartquiz.Model.Exam;
 import com.example.smartquiz.Model.Question;
 import com.example.smartquiz.Model.Submission;
 import com.example.smartquiz.Model.SubmissionAnswer;
+import com.example.smartquiz.Util.LoadingDialogFragment;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class takeTestActivity extends AppCompatActivity {
     private ImageButton submitButton;
     private ExamController examController;
     private List<Question> questionList;
+    private LoadingDialogFragment loadingDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +77,7 @@ public class takeTestActivity extends AppCompatActivity {
         }
 
         submitButton.setOnClickListener(view -> {
+            showLoading(true);
             submissionExam(examId);
         });
     }
@@ -259,6 +262,23 @@ public class takeTestActivity extends AppCompatActivity {
         }
 
         questionsLinearLayout.addView(answerRadioGroup);
+    }
+
+    private void showLoading(boolean show) {
+        if (show) {
+            if (loadingDialog == null || !loadingDialog.isVisible()) {
+                loadingDialog = LoadingDialogFragment.newInstance();
+                // Ensure LoadingDialogFragment.TAG is defined in LoadingDialogFragment
+                loadingDialog.show(getSupportFragmentManager(), LoadingDialogFragment.TAG);
+            }
+
+        } else {
+            if (loadingDialog != null && loadingDialog.isVisible()) {
+                loadingDialog.dismissAllowingStateLoss();
+            }
+            loadingDialog = null; // Clear reference
+
+        }
     }
 
 }

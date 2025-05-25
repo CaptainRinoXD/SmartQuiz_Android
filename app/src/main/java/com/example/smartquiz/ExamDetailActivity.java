@@ -59,6 +59,7 @@ public class ExamDetailActivity extends AppCompatActivity {
             Intent newIntent = new Intent(ExamDetailActivity.this, takeTestActivity.class);
             newIntent.putExtra("examId",examId);
             startActivity(newIntent);
+            
         });
 
         cancel.setOnClickListener(v-> {
