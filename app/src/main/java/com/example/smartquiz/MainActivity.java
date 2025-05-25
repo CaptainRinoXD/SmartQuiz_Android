@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (userId != null) {
             SubmissionController submissionController = new SubmissionController();
-            submissionController.getSubmissionCountForStudent((value) -> {});
+            //submissionController.getSubmissionCountForStudent((value) -> {});
             //submissionController.getTotalDurationForStudent((value) -> {});
 
             userController.getCurrentUserDocument((value, error) -> {
