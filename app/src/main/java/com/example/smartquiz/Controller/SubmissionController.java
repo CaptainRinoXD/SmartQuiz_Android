@@ -116,22 +116,23 @@ public class SubmissionController extends BaseController {
                     int totalDuration = 0;
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                         Submission submission = document.toObject(Submission.class);
+                        assert submission != null;
                         totalDuration += submission.getDuration();
                     }
                     listener.onSuccess(totalDuration);
 
-                    UserController userController = new UserController();
-                    final int tDuration = totalDuration;
-                    userController.getCurrentUserDocument((value, error) -> {
-                        if (error != null) {
-                            return;
-                        }
-                        if (value != null ) {
-                            User currentUser = value.toObject(User.class);
-                            currentUser.setTotalTime(tDuration);
-                            userController.updateUserDocument(currentUser, null);
-                        }
-                    });
+//                    UserController userController = new UserController();
+//                    final int tDuration = totalDuration;
+//                    userController.getCurrentUserDocument((value, error) -> {
+//                        if (error != null) {
+//                            return;
+//                        }
+//                        if (value != null ) {
+//                            User currentUser = value.toObject(User.class);
+//                            currentUser.setTotalTime(tDuration);
+//                            userController.updateUserDocument(currentUser, null);
+//                        }
+//                    });
 
                 });
     }
@@ -144,18 +145,18 @@ public class SubmissionController extends BaseController {
                 .addOnSuccessListener(querySnapshot -> {
                     int submissionCount = querySnapshot.size();
                     listener.onSuccess(submissionCount);
-                    UserController userController = new UserController();
-
-                    userController.getCurrentUserDocument((value,error)-> {
-                        if (error != null) {
-                            return;
-                        }
-                        if (value != null ) {
-                            User currentUser = value.toObject(User.class);
-                            currentUser.setTotalExams(submissionCount);
-                            userController.updateUserDocument(currentUser, null);
-                        }
-                    });
+//                    UserController userController = new UserController();
+//
+//                    userController.getCurrentUserDocument((value,error)-> {
+//                        if (error != null) {
+//                            return;
+//                        }
+//                        if (value != null ) {
+//                            User currentUser = value.toObject(User.class);
+//                            currentUser.setTotalExams(submissionCount);
+//                            userController.updateUserDocument(currentUser, null);
+//                        }
+//                    });
 
                 });
     }

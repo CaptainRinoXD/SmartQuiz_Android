@@ -45,6 +45,7 @@ public class takeTestActivity extends AppCompatActivity {
     private ExamController examController;
     private List<Question> questionList;
     private LoadingDialogFragment loadingDialog;
+    private int durationInMinutes;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,7 +121,7 @@ public class takeTestActivity extends AppCompatActivity {
             }
             Exam exam = value.toObject(Exam.class);
             if (exam != null) {
-                int durationInMinutes = exam.getDuration();
+                durationInMinutes = exam.getDuration();
                 int durationInMillis = durationInMinutes * 60 * 1000;
                 timerDuration(durationInMillis, examId);
             }
@@ -178,15 +179,15 @@ public class takeTestActivity extends AppCompatActivity {
         }
         submission.setAnswers(answers);
         String durationString = textViewDuration.getText().toString();
-        int durationInMinutes = 0;
         if (!durationString.equals("Finish")) {
-            durationInMinutes = Integer.parseInt(durationString.split(":")[0]);
+            durationInMinutes = durationInMinutes - Integer.parseInt(durationString.split(":")[0]);
             //int durationInMillis = durationInMinutes * 60 * 1000;
         }
 
         SubmissionController submissionController = new SubmissionController();
         submissionController.submitExam(submission, durationInMinutes, task -> {
             if (task.isSuccessful()) {
+                showLoading(false);
                 Log.d(TAG, "Exam submitted successfully");
                 Toast.makeText(takeTestActivity.this, "Exam submitted successfully", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(takeTestActivity.this, MainActivity.class);
@@ -270,6 +271,7 @@ public class takeTestActivity extends AppCompatActivity {
                 loadingDialog = LoadingDialogFragment.newInstance();
                 // Ensure LoadingDialogFragment.TAG is defined in LoadingDialogFragment
                 loadingDialog.show(getSupportFragmentManager(), LoadingDialogFragment.TAG);
+                setUiEnabled(false);
             }
 
         } else {
@@ -277,7 +279,14 @@ public class takeTestActivity extends AppCompatActivity {
                 loadingDialog.dismissAllowingStateLoss();
             }
             loadingDialog = null; // Clear reference
+            setUiEnabled(true);
+        }
+    }
 
+    private void setUiEnabled(boolean enabled) {
+        submitButton.setEnabled(enabled);
+        for (int i = 0; i < questionsLinearLayout.getChildCount(); i++) {
+            questionsLinearLayout.getChildAt(i).setEnabled(enabled);
         }
     }
 

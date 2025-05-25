@@ -91,8 +91,8 @@ public class RegisterActivity extends AppCompatActivity {
         newUser.setRole(role);
         showLoading(true);
         userController.signUpUserDocument(email, password, newUser, task-> {
+            showLoading(false);
             if(task.isSuccessful()) {
-                showLoading(false);
                 Toast.makeText(RegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -73,16 +73,24 @@ public class MainActivity extends AppCompatActivity {
 
         if (userId != null) {
             SubmissionController submissionController = new SubmissionController();
-            //submissionController.getSubmissionCountForStudent((value) -> {});
-            //submissionController.getTotalDurationForStudent((value) -> {});
+            submissionController.getSubmissionCountForStudent((value) -> {
+                if(value != null) {
+                    totalExamNumTextView.setText(String.valueOf(value));
+                }
+            });
+            submissionController.getTotalDurationForStudent((value) -> {
+                if(value != null) {
+                    totalTimeNumTextView.setText(String.valueOf(value));
+                }
+            });
 
             userController.getCurrentUserDocument((value, error) -> {
                 if (value != null && value.exists()) {
                     User user = value.toObject(User.class);
-                    int totalExams = user.getTotalExams();
-                    long totalTime = user.getTotalTime();
-                    totalExamNumTextView.setText(String.valueOf(totalExams));
-                    totalTimeNumTextView.setText(String.valueOf(totalTime));
+                    //int totalExams = user.getTotalExams();
+                    //long totalTime = user.getTotalTime();
+                    //totalExamNumTextView.setText(String.valueOf(totalExams));
+                    //totalTimeNumTextView.setText(String.valueOf(totalTime));
 
                     Map<String, Long> testData = new HashMap<>();
                     testData.put("2025-05-15", 3L);
