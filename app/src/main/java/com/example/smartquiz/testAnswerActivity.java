@@ -34,9 +34,9 @@ public class testAnswerActivity extends AppCompatActivity {
     private static final String TAG = "testAnswerActivity";
 
     private String examId;
-    private TextView textViewDuration;
+
     private LinearLayout questionsLinearLayout;
-    private ImageButton submitButton;
+
     private ExamController examController;
     private List<Question> questionList;
 
@@ -44,7 +44,7 @@ public class testAnswerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_take_test);
+        setContentView(R.layout.activity_test_answer);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -58,8 +58,7 @@ public class testAnswerActivity extends AppCompatActivity {
         });
 
         questionsLinearLayout = findViewById(R.id.questionsLinearLayout);
-        textViewDuration = findViewById(R.id.duration);
-        submitButton = findViewById(R.id.imageButton7);
+
         questionList = new ArrayList<>();
 
         Intent intent = getIntent();
@@ -73,7 +72,6 @@ public class testAnswerActivity extends AppCompatActivity {
             Log.d(TAG, "No exam id received.");
         }
 
-        submitButton.setVisibility(View.GONE); // Ẩn nút nộp bài vì đang xem lại
     }
 
     private void fetchExamQuesion(String examId) {
