@@ -104,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
                     testData.put("2025-10-19", 6L);
                     testData.put("2025-11-19", 6L);
 
-
                     showLineChart(testData);
 
                 }

@@ -161,4 +161,18 @@ public class SubmissionController extends BaseController {
                 });
     }
 
+    public void getSubmissionByExamId(String examId, OnSuccessListener<Submission> listener) {
+        db.collection("submissions")
+                .whereEqualTo("examId", examId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        Submission submission = querySnapshot.getDocuments().get(0).toObject(Submission.class);
+                        listener.onSuccess(submission);
+                    } else {
+                        listener.onSuccess(null);
+                    }
+                });
+    }
+
 }

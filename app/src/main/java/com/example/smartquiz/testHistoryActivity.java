@@ -1,5 +1,6 @@
 package com.example.smartquiz;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -48,9 +49,10 @@ public class testHistoryActivity extends AppCompatActivity {
                     String examId = submission.getExamId();
                     ExamController examController = new ExamController();
                     examController.fetchExamDetails(examId, (value, error) -> {
-                        if(value != null && value.exists()) {
+                        if (value != null && value.exists()) {
                             Exam exam = value.toObject(Exam.class);
                             String examTitle = exam.getTitle();
+
                             TextView examTextView = new TextView(this);
                             examTextView.setText(examTitle);
 
@@ -63,19 +65,25 @@ public class testHistoryActivity extends AppCompatActivity {
                             examTextView.setLayoutParams(params);
 
                             examTextView.setBackgroundResource(R.drawable.white_box);
-
                             int paddingPx = dpToPx(16);
                             examTextView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+
+                            // 👇 THÊM: bắt sự kiện click để chuyển sang TestAnswerActivity
+                            examTextView.setOnClickListener(v -> {
+                                Intent intent = new Intent(testHistoryActivity.this, testAnswerActivity.class);
+                                intent.putExtra("examId", examId);
+                                startActivity(intent);
+                            });
+
                             topicListLayout.addView(examTextView);
                         }
-
-
                     });
                 }
             }
         });
     }
-    
+
+
     private int dpToPx(int dp) {
         float density = getResources().getDisplayMetrics().density;
         return Math.round((float) dp * density);
