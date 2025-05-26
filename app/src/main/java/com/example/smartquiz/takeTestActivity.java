@@ -1,5 +1,7 @@
 package com.example.smartquiz;
 
+import static androidx.core.util.TimeUtils.formatDuration;
+
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -46,11 +48,15 @@ public class takeTestActivity extends AppCompatActivity {
     private List<Question> questionList;
     private LoadingDialogFragment loadingDialog;
     private int durationInMinutes;
+    private long startTimeMillis;
+    private String examTitle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_take_test);
+        startTimeMillis = System.currentTimeMillis();
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.hide();
@@ -68,6 +74,8 @@ public class takeTestActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
+        //String examId = intent.getStringExtra("examId");
+        examTitle = intent.getStringExtra("examTitle");
         if (extras != null) {
             examId = extras.getString("examId");
             Log.d(TAG, "Received exam id: " + examId);
@@ -186,17 +194,77 @@ public class takeTestActivity extends AppCompatActivity {
 
         SubmissionController submissionController = new SubmissionController();
         submissionController.submitExam(submission, durationInMinutes, task -> {
+//            if (task.isSuccessful()) {
+//                showLoading(false);
+//                Log.d(TAG, "Exam submitted successfully");
+//                Toast.makeText(takeTestActivity.this, "Exam submitted successfully", Toast.LENGTH_SHORT).show();
+//                Intent intent = new Intent(takeTestActivity.this, MainActivity.class);
+//                startActivity(intent);
+//            } else {
+//                Log.w(TAG, "Error submitting exam", task.getException());
+//                Toast.makeText(takeTestActivity.this, "Error submitting exam: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+//            }
             if (task.isSuccessful()) {
+                // Tính thời gian làm bài
+                long endTimeMillis = System.currentTimeMillis();
+                long durationMillis = endTimeMillis - startTimeMillis;
+                String formattedDuration = formatDuration(durationMillis);
+
+                // Tính điểm
+                int score = 0;
+                int totalQuestions = questionList.size();
+                for (SubmissionAnswer answer : answers) {
+                    String questionId = answer.getQuestionId();
+                    int selectedIndex = answer.getSelectedAnswerIndex();
+                    for (Question q : questionList) {
+                        if (q.getId().equals(questionId)) {
+                            if (selectedIndex == q.getCorrectAnswerIndex()) {
+                                score++;
+                            }
+                            break;
+                        }
+                    }
+                }
+
                 showLoading(false);
                 Log.d(TAG, "Exam submitted successfully");
                 Toast.makeText(takeTestActivity.this, "Exam submitted successfully", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(takeTestActivity.this, MainActivity.class);
+                Intent intent = new Intent(takeTestActivity.this, resultActivity.class);
+                intent.putExtra("score", score);
+                intent.putExtra("totalQuestions", totalQuestions);
+                intent.putExtra("examDuration", formattedDuration);
+                intent.putExtra("examTitle", examTitle);  // Sử dụng biến thành viên
                 startActivity(intent);
-            } else {
-                Log.w(TAG, "Error submitting exam", task.getException());
-                Toast.makeText(takeTestActivity.this, "Error submitting exam: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+
+
             }
+
         });
+
+
+        // Tính thời gian làm bài
+        long endTimeMillis = System.currentTimeMillis();
+        long durationMillis = endTimeMillis - startTimeMillis;
+        String formattedDuration = formatDuration(durationMillis);
+
+// Tính điểm
+        int score = 0;
+        int totalQuestions = questionList.size();
+
+        for (SubmissionAnswer answer : answers) {
+            String questionId = answer.getQuestionId();
+            int selectedIndex = answer.getSelectedAnswerIndex();
+            // Tìm câu hỏi tương ứng
+            for (Question q : questionList) {
+                if (q.getId().equals(questionId)) {
+                    if (selectedIndex == q.getCorrectAnswerIndex()) {
+                        score++;
+                    }
+                    break;
+                }
+            }
+        }
+
     }
 
     private void addQuestionToUI(Question question, int questionNumber) {
@@ -282,6 +350,14 @@ public class takeTestActivity extends AppCompatActivity {
             setUiEnabled(true);
         }
     }
+
+    private String formatDuration(long durationMillis) {
+        long seconds = (durationMillis / 1000) % 60;
+        long minutes = (durationMillis / 1000) / 60;
+        return String.format("%02d:%02d", minutes, seconds);
+    }
+
+
 
     private void setUiEnabled(boolean enabled) {
         submitButton.setEnabled(enabled);

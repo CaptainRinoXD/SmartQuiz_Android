@@ -55,12 +55,14 @@ public class ExamDetailActivity extends AppCompatActivity {
         }
         loadExamDetails();
 
-        enter.setOnClickListener(v-> {
+        enter.setOnClickListener(v -> {
             Intent newIntent = new Intent(ExamDetailActivity.this, takeTestActivity.class);
-            newIntent.putExtra("examId",examId);
+            newIntent.putExtra("examId", examId);
+            // Lấy text từ TextView examTitle và truyền vào Intent
+            newIntent.putExtra("examTitle", examTitle.getText().toString());
             startActivity(newIntent);
-            
         });
+
 
         cancel.setOnClickListener(v-> {
             Intent newIntent = new Intent(ExamDetailActivity.this, ListTestActivity.class);
