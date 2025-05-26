@@ -7,7 +7,16 @@ public class Exam {
     public String createdBy;
     public Date createdAt;
     public int duration;
+    private String sessionId;
 
+    
+    public Exam(String title, String createdBy, Date createdAt, int duration, String sessionId) {
+        this.title = title;
+        this.createdBy = createdBy;
+        this.createdAt = createdAt;
+        this.duration = duration;
+        this.sessionId = sessionId;
+    }
     public Exam() {}
     public String getTitle() {
         return title;
@@ -41,11 +50,13 @@ public class Exam {
         this.duration = duration;
     }
 
-    public Exam(String title, String createdBy, Date createdAt, int duration) {
-        this.title = title;
-        this.createdBy = createdBy;
-        this.createdAt = createdAt;
-        this.duration = duration;
+    public String getSessionId() {
+        return sessionId;
     }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
 }
 

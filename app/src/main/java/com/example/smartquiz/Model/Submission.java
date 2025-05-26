@@ -8,14 +8,35 @@ public class Submission {
     private String studentId;
     private Date submittedAt;
     private float score;
+    private String assessmentId;
     private List<SubmissionAnswer> answers;
     private int duration;
+
+    public Submission(String examId, String studentId, Date submittedAt, float score, String assessmentId,
+            List<SubmissionAnswer> answers, int duration) {
+        this.examId = examId;
+        this.studentId = studentId;
+        this.submittedAt = submittedAt;
+        this.score = score;
+        this.assessmentId = assessmentId;
+        this.answers = answers;
+        this.duration = duration;
+    }
 
     public Submission() {
         // Required for Firestore
     }
 
     // Getters and setters
+
+    public String getAssessmentId() {
+        return assessmentId;
+    }
+
+    public void setAssessmentId(String assessmentId) {
+        this.assessmentId = assessmentId;
+    }
+
     public String getExamId() {
         return examId;
     }
@@ -64,13 +85,4 @@ public class Submission {
         this.duration = duration;
     }
 
-    public Submission(String examId, String studentId, Date submittedAt, float score, List<SubmissionAnswer> answers,
-            int duration) {
-        this.examId = examId;
-        this.studentId = studentId;
-        this.submittedAt = submittedAt;
-        this.score = score;
-        this.answers = answers;
-        this.duration = duration;
-    }
 }
