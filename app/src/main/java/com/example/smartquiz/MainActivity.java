@@ -1,11 +1,7 @@
 package com.example.smartquiz;
 
 import android.graphics.Color;
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -17,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.smartquiz.Controller.SubmissionController;
 import com.example.smartquiz.Controller.UserController;
+import com.example.smartquiz.Model.Submission;
 import com.example.smartquiz.Model.User;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -28,8 +25,6 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -37,10 +32,7 @@ import java.util.TreeMap;
 
 public class MainActivity extends AppCompatActivity {
 
-
-   // private  Header_Controller headerController;
     private UserController userController;
-
     private TextView totalExamNumTextView;
     private TextView totalTimeNumTextView;
     private LineChart lineChart;
@@ -51,78 +43,60 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
+        if (actionBar != null) actionBar.hide();
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-
-        lineChart = findViewById(R.id.lineChart);  // lấy view lineChart
-
+        lineChart = findViewById(R.id.lineChart);
         Header_Controller.setup(this);
 
         userController = new UserController();
-        String userId = userController.getCurrentUserId();
-
         totalExamNumTextView = findViewById(R.id.total_exam_num);
         totalTimeNumTextView = findViewById(R.id.total_time_num);
 
+        String userId = userController.getCurrentUserId();
         if (userId != null) {
             SubmissionController submissionController = new SubmissionController();
-            submissionController.getSubmissionCountForStudent((value) -> {
-                if(value != null) {
+
+            submissionController.getSubmissionCountForStudent(value -> {
+                if (value != null) {
                     totalExamNumTextView.setText(String.valueOf(value));
                 }
             });
-            submissionController.getTotalDurationForStudent((value) -> {
-                if(value != null) {
+
+            submissionController.getTotalDurationForStudent(value -> {
+                if (value != null) {
                     totalTimeNumTextView.setText(String.valueOf(value));
                 }
             });
 
-            userController.getCurrentUserDocument((value, error) -> {
-                if (value != null && value.exists()) {
-                    User user = value.toObject(User.class);
-                    //int totalExams = user.getTotalExams();
-                    //long totalTime = user.getTotalTime();
-                    //totalExamNumTextView.setText(String.valueOf(totalExams));
-                    //totalTimeNumTextView.setText(String.valueOf(totalTime));
+            submissionController.getAllSubmissionsFromStudent(submissions -> {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                Map<String, Long> dailyData = new TreeMap<>();
 
-                    Map<String, Long> testData = new HashMap<>();
-                    testData.put("2025-05-15", 3L);
-                    testData.put("2025-05-16", 7L);
-                    testData.put("2025-05-17", 5L);
-                    testData.put("2025-05-18", 8L);
-                    testData.put("2025-06-19", 6L);
-                    testData.put("2025-07-19", 6L);
-                    testData.put("2025-08-19", 6L);
-                    testData.put("2025-09-19", 10L);
-                    testData.put("2025-10-19", 6L);
-                    testData.put("2025-11-19", 6L);
-
-                    showLineChart(testData);
-
+                for (Submission s : submissions) {
+                    String dateKey = sdf.format(s.getSubmittedAt());
+                    dailyData.put(dateKey, dailyData.getOrDefault(dateKey, 0L) + 1);
                 }
+
+                showLineChart(dailyData);
             });
         }
     }
 
     private void showLineChart(Map<String, Long> exerciseHistory) {
-        // Sắp xếp map theo ngày tăng dần
         Map<String, Long> sortedMap = new TreeMap<>(exerciseHistory);
-
         List<Entry> entries = new ArrayList<>();
         List<String> dates = new ArrayList<>();
 
         int index = 0;
-        for (String dateStr : sortedMap.keySet()) {
-            dates.add(dateStr);
-            long count = sortedMap.get(dateStr);
-            entries.add(new Entry(index, count));
+        for (Map.Entry<String, Long> entry : sortedMap.entrySet()) {
+            dates.add(entry.getKey());
+            entries.add(new Entry(index, entry.getValue()));
             index++;
         }
 
@@ -132,25 +106,18 @@ public class MainActivity extends AppCompatActivity {
         lineDataSet.setLineWidth(2f);
         lineDataSet.setCircleRadius(7f);
         lineDataSet.setCircleColor(Color.RED);
-
-
+        lineDataSet.setValueTextSize(12f);
 
         LineData lineData = new LineData(lineDataSet);
         lineChart.setData(lineData);
 
-        // Định dạng trục X hiển thị ngày tháng (chỉ MM-dd cho gọn)
         XAxis xAxis = lineChart.getXAxis();
-        xAxis.setTextSize(12f);
-        lineChart.getAxisLeft().setTextSize(12f); // ← tăng size chữ trục Y bên trái
-        lineChart.getAxisRight().setEnabled(false);
-        lineDataSet.setValueTextSize(12f);
-        lineChart.getLegend().setTextSize(10f);
-        lineChart.getLegend().setEnabled(false);
-        xAxis.setGranularity(1f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setTextSize(12f);
+        xAxis.setGranularity(1f);
         xAxis.setDrawGridLines(false);
-        xAxis.setLabelRotationAngle(0f); // không xoay
-        lineChart.setExtraBottomOffset(24f); // tăng khoảng cách dưới
+        xAxis.setLabelRotationAngle(0f);
+        lineChart.setExtraBottomOffset(24f);
 
         xAxis.setValueFormatter(new ValueFormatter() {
             @Override
@@ -166,32 +133,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Cấu hình chú thích (legend) không nằm đè lên trục X
-        lineChart.getLegend().setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
-        lineChart.getLegend().setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
-        lineChart.getLegend().setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        lineChart.getLegend().setDrawInside(false); // rất quan trọng: vẽ ngoài vùng biểu đồ
-
-        // Thêm khoảng cách bên dưới để không bị đè lên nhãn trục X
-        lineChart.setExtraBottomOffset(10f);
-
-        // Tăng kích thước tối thiểu trục X nếu số lượng ngày quá nhiều
-        int minDaysVisible = 5;
-        int totalDays = dates.size();
-
-        lineChart.setVisibleXRangeMaximum(minDaysVisible); // tối thiểu bao nhiêu ngày hiển thị cùng lúc
-
-        // Cho phép cuộn ngang nếu dữ liệu nhiều
-        lineChart.setDragEnabled(true);
-        lineChart.setScaleEnabled(false); // không cho zoom để tránh rối
-
-        // Di chuyển về điểm cuối cùng (mới nhất)
-        lineChart.moveViewToX(totalDays);
-
-
-
+        lineChart.getAxisLeft().setTextSize(12f);
+        lineChart.getAxisRight().setEnabled(false);
+        lineChart.getLegend().setEnabled(false);
         lineChart.getDescription().setEnabled(false);
 
-        lineChart.invalidate(); // cập nhật biểu đồ
+        // ➤ Chỉ hiển thị 7 ngày gần nhất và cho phép cuộn
+        lineChart.setVisibleXRangeMaximum(7);
+        lineChart.setDragEnabled(true);
+        lineChart.setScaleEnabled(false);
+        lineChart.moveViewToX(entries.size() - 1); // cuộn đến điểm cuối
+
+        lineChart.invalidate();
     }
+
 }
