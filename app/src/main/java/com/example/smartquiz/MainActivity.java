@@ -2,6 +2,7 @@ package com.example.smartquiz;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -14,9 +15,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.smartquiz.Controller.SubmissionController;
 import com.example.smartquiz.Controller.UserController;
 import com.example.smartquiz.Model.Submission;
-import com.example.smartquiz.Model.User;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -36,6 +35,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView totalExamNumTextView;
     private TextView totalTimeNumTextView;
     private LineChart lineChart;
+    private Button btnNext, btnPrevious;
+
+    private final int PAGE_SIZE = 7;
+    private int currentPage = 0;
+
+    private List<Entry> allEntries = new ArrayList<>();
+    private List<String> allDates = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +63,23 @@ public class MainActivity extends AppCompatActivity {
         userController = new UserController();
         totalExamNumTextView = findViewById(R.id.total_exam_num);
         totalTimeNumTextView = findViewById(R.id.total_time_num);
+        btnNext = findViewById(R.id.btnNext);
+        btnPrevious = findViewById(R.id.btnPrevious);
+
+        btnNext.setOnClickListener(v -> {
+            int maxPage = (int) Math.ceil((double) allEntries.size() / PAGE_SIZE);
+            if (currentPage < maxPage - 1) {
+                currentPage++;
+                updateChartPage();
+            }
+        });
+
+        btnPrevious.setOnClickListener(v -> {
+            if (currentPage > 0) {
+                currentPage--;
+                updateChartPage();
+            }
+        });
 
         String userId = userController.getCurrentUserId();
         if (userId != null) {
@@ -75,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
             submissionController.getAllSubmissionsFromStudent(submissions -> {
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM", Locale.getDefault());
                 Map<String, Long> dailyData = new TreeMap<>();
 
                 for (Submission s : submissions) {
@@ -83,24 +106,40 @@ public class MainActivity extends AppCompatActivity {
                     dailyData.put(dateKey, dailyData.getOrDefault(dateKey, 0L) + 1);
                 }
 
-                showLineChart(dailyData);
+                prepareChartData(dailyData);
             });
         }
     }
 
-    private void showLineChart(Map<String, Long> exerciseHistory) {
+    private void prepareChartData(Map<String, Long> exerciseHistory) {
         Map<String, Long> sortedMap = new TreeMap<>(exerciseHistory);
-        List<Entry> entries = new ArrayList<>();
-        List<String> dates = new ArrayList<>();
+        allEntries.clear();
+        allDates.clear();
 
         int index = 0;
         for (Map.Entry<String, Long> entry : sortedMap.entrySet()) {
-            dates.add(entry.getKey());
-            entries.add(new Entry(index, entry.getValue()));
+            allDates.add(entry.getKey());
+            allEntries.add(new Entry(index, entry.getValue()));
             index++;
         }
 
-        LineDataSet lineDataSet = new LineDataSet(entries, "Số bài làm mỗi ngày");
+        currentPage = (int) Math.max(0, Math.ceil(allEntries.size() / (double) PAGE_SIZE) - 1);
+        updateChartPage();
+    }
+
+    private void updateChartPage() {
+        int start = currentPage * PAGE_SIZE;
+        int end = Math.min(start + PAGE_SIZE, allEntries.size());
+
+        List<Entry> pageEntries = new ArrayList<>();
+        List<String> pageDates = new ArrayList<>();
+
+        for (int i = start; i < end; i++) {
+            pageEntries.add(new Entry(i - start, allEntries.get(i).getY()));
+            pageDates.add(allDates.get(i));
+        }
+
+        LineDataSet lineDataSet = new LineDataSet(pageEntries, "Số bài làm mỗi ngày");
         lineDataSet.setColor(Color.BLUE);
         lineDataSet.setValueTextColor(Color.BLACK);
         lineDataSet.setLineWidth(2f);
@@ -123,28 +162,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public String getFormattedValue(float value) {
                 int i = (int) value;
-                if (i >= 0 && i < dates.size()) {
-                    String[] parts = dates.get(i).split("-");
-                    if (parts.length == 3) {
-                        return parts[2] + "-" + parts[1]; // dd-MM
-                    }
+                if (i >= 0 && i < pageDates.size()) {
+                    return pageDates.get(i); // Hiển thị dd-MM-yyyy đầy đủ
                 }
                 return "";
             }
         });
 
+
         lineChart.getAxisLeft().setTextSize(12f);
         lineChart.getAxisRight().setEnabled(false);
         lineChart.getLegend().setEnabled(false);
         lineChart.getDescription().setEnabled(false);
-
-        // ➤ Chỉ hiển thị 7 ngày gần nhất và cho phép cuộn
-        lineChart.setVisibleXRangeMaximum(7);
-        lineChart.setDragEnabled(true);
+        lineChart.setDragEnabled(false);
         lineChart.setScaleEnabled(false);
-        lineChart.moveViewToX(entries.size() - 1); // cuộn đến điểm cuối
-
         lineChart.invalidate();
     }
-
 }
