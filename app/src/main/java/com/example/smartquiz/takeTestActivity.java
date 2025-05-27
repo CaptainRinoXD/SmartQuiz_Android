@@ -189,8 +189,10 @@ public class takeTestActivity extends AppCompatActivity {
                 showLoading(false);
                 Log.d(TAG, "Exam submitted successfully");
                 Toast.makeText(takeTestActivity.this, "Exam submitted successfully", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(takeTestActivity.this, MainActivity.class);
+                Intent intent = new Intent(takeTestActivity.this, ResultActivity.class);
+                intent.putExtra("examId", submission.getExamId());
                 startActivity(intent);
+                finish();
             } else {
                 Log.w(TAG, "Error submitting exam", task.getException());
                 Toast.makeText(takeTestActivity.this, "Error submitting exam: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
