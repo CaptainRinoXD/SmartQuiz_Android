@@ -17,6 +17,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.smartquiz.Controller.UserController;
 import com.example.smartquiz.Model.User;
+import com.example.smartquiz.TeacherActiviy.TeacherMainActivity;
 import com.example.smartquiz.Util.LoadingDialogFragment;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -98,12 +99,11 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 } else if (userRole.equals("Teacher")) {
-//                    Intent intent = new Intent(LoginActivity.this, TeacherMainActivity.class);
-//                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    startActivity(intent);
-//                    finish();
+                    Intent intent = new Intent(LoginActivity.this, TeacherMainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
                 }
-
             }
         });
     }

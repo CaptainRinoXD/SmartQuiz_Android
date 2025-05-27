@@ -2,36 +2,82 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
-             android:layout_height="match_parent">
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/main"
+        android:id="@+id/constraintLayout5"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/light_blue"
+        android:background="@color/white"
         tools:context=".MainActivity">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout3"
-            android:layout_width="412dp"
-            android:layout_height="665dp"
+            android:layout_width="410dp"
+            android:layout_height="709dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/constraintLayout"
-            app:layout_constraintVertical_bias="0.218">
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+            app:layout_constraintVertical_bias="0.692">
 
             <ImageView
                 android:id="@+id/imageButton2"
-                android:layout_width="272dp"
-                android:layout_height="426dp"
+                android:layout_width="381dp"
+                android:layout_height="322dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.516"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.644"
+                app:layout_constraintVertical_bias="0.046"
                 app:srcCompat="@drawable/box" />
+
+            <ImageView
+                android:id="@+id/imageButton8"
+                android:layout_width="381dp"
+                android:layout_height="322dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.484"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageButton2"
+                app:layout_constraintVertical_bias="0.326"
+                app:srcCompat="@drawable/box" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="171dp"
+                android:layout_height="74dp"
+                android:text="Số lớp đang tiếp quản"
+                android:textAlignment="center"
+                android:textColor="#43558C"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/imageButton8"
+                app:layout_constraintEnd_toEndOf="@+id/imageButton8"
+                app:layout_constraintHorizontal_bias="0.509"
+                app:layout_constraintStart_toStartOf="@+id/imageButton8"
+                app:layout_constraintTop_toTopOf="@+id/imageButton8"
+                app:layout_constraintVertical_bias="0.213" />
+
+            <TextView
+                android:id="@+id/total_class"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="null"
+                android:textAlignment="center"
+                android:textColor="#43558C"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/imageButton8"
+                app:layout_constraintEnd_toEndOf="@+id/imageButton8"
+                app:layout_constraintHorizontal_bias="0.503"
+                app:layout_constraintStart_toStartOf="@+id/imageButton8"
+                app:layout_constraintTop_toBottomOf="@+id/textView5"
+                app:layout_constraintVertical_bias="0.282" />
 
             <TextView
                 android:id="@+id/textView4"
@@ -64,6 +110,56 @@
                 app:layout_constraintStart_toStartOf="@+id/imageButton2"
                 app:layout_constraintTop_toBottomOf="@+id/textView4"
                 app:layout_constraintVertical_bias="0.169" />
+
+            <LinearLayout
+                android:id="@+id/floating_menu"
+                android:layout_width="385dp"
+                android:layout_height="690dp"
+                android:layout_margin="16dp"
+                android:background="@drawable/white_box"
+                android:elevation="8dp"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/menu_home"
+                    android:layout_width="224dp"
+                    android:layout_height="122dp"
+                    android:padding="8dp"
+                    android:text="Upload đề"
+                    android:textSize="18sp" />
+
+
+                <TextView
+                    android:id="@+id/classes"
+                    android:layout_width="224dp"
+                    android:layout_height="122dp"
+                    android:padding="8dp"
+                    android:text="Lớp Học"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/menu_test"
+                    android:layout_width="223dp"
+                    android:layout_height="111dp"
+                    android:padding="8dp"
+                    android:text="Sửa đề"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/menu_answer"
+                    android:layout_width="222dp"
+                    android:layout_height="145dp"
+                    android:padding="8dp"
+                    android:text="Tạo đề"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -126,47 +222,6 @@
                 app:srcCompat="@drawable/user" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <LinearLayout
-            android:id="@+id/floating_menu"
-            android:layout_width="385dp"
-            android:layout_height="690dp"
-            android:layout_margin="16dp"
-            android:layout_marginStart="16dp"
-            android:background="@drawable/white_box"
-            android:elevation="8dp"
-            android:orientation="vertical"
-            android:padding="12dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/constraintLayout">
-
-            <TextView
-                android:id="@+id/menu_home"
-                android:layout_width="224dp"
-                android:layout_height="122dp"
-                android:padding="8dp"
-                android:text="Upload đề"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/menu_test"
-                android:layout_width="223dp"
-                android:layout_height="111dp"
-                android:padding="8dp"
-                android:text="Sửa đề"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/menu_answer"
-                android:layout_width="222dp"
-                android:layout_height="145dp"
-                android:padding="8dp"
-                android:text="Tạo đề"
-                android:textSize="18sp" />
-
-        </LinearLayout>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

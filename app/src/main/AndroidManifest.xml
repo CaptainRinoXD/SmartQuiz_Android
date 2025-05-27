@@ -12,11 +12,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartQuiz"
         tools:targetApi="31">
-
+        <activity
+            android:name=".TeacherActiviy.TeacherAddClassActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TeacherActiviy.TeacherListClassActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TeacherActiviy.TeacherMainActivity"
+            android:exported="false" />
         <activity
             android:name=".testAnswerActivity"
             android:exported="false" />
-
         <activity
             android:name=".testHistoryActivity"
             android:exported="false" />
@@ -40,6 +47,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

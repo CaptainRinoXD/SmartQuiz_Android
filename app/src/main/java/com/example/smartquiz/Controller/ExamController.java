@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
@@ -32,6 +33,27 @@ public class ExamController extends BaseController {
             }
             batch.commit().addOnCompleteListener(listener);
         });
+    }
+
+    /**
+     * Thêm danh sách studentIds vào Class.
+     * Sử dụng FieldValue.arrayUnion để tự động loại bỏ ID trùng lặp.
+     *
+     * @param examId         ID của Exam
+     * @param sessionIdtoAdd Danh sách session ID (String) muốn thêm
+     * @param listener       Listener cho kết quả hoàn thành
+     */
+    public void addSessionId(
+            String examId,
+            List<String> sessionIdtoAdd,
+            OnCompleteListener<Void> listener) {
+
+        DocumentReference docRef = db.collection("exam").document(examId);
+
+        // Sử dụng update với FieldValue.arrayUnion để thêm các ID vào mảng
+        // Firestore sẽ tự động bỏ qua các ID đã tồn tại trong mảng studentsId
+        docRef.update("sessionId", FieldValue.arrayUnion(sessionIdtoAdd.toArray()))
+                .addOnCompleteListener(listener);
     }
 
     public void deleteExam(String examId, OnCompleteListener<Void> listener) {

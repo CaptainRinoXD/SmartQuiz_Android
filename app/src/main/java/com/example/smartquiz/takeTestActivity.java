@@ -24,7 +24,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.smartquiz.Controller.ExamController;
 import com.example.smartquiz.Controller.SubmissionController;
-import com.example.smartquiz.Model.Answer;
 import com.example.smartquiz.Model.Exam;
 import com.example.smartquiz.Model.Question;
 import com.example.smartquiz.Model.Submission;

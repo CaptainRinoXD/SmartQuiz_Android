@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="@android:color/white"> <!-- Changed tint to white -->
+
+    <!-- Original path thickness was 2 units (e.g., from y=11 to y=13, or x=11 to x=13). -->
+    <!-- This new path increases thickness to 4 units (e.g., from y=10 to y=14, or x=10 to x=14). -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M19,13H13.5V18.5H10.5V13H5V11H10.5V5.5H13.5V11H19V13Z"/>
+
+</vector>

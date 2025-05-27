@@ -7,6 +7,7 @@ public class Assessment {
     private String title;
     private String createdBy;
     private String classId;
+    private List<StudentInfo> student;
 
     public Assessment() {
         // Required for Firestore
@@ -42,4 +43,38 @@ public class Assessment {
     public void setClassId(String classId) {
         this.classId = classId;
     }
+
+    public List<StudentInfo> getStudent() {
+        return student;
+    }
+
+    public void setStudent(List<StudentInfo> student) {
+        this.student = student;
+    }
+
+    public static class StudentInfo {
+        private String userId;
+        private boolean isSelected;
+
+        public StudentInfo() {
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+
+        public boolean isSelected() {
+            return isSelected;
+        }
+
+        public void setSelected(boolean selected) {
+            isSelected = selected;
+        }
+    }
+
+    
 }

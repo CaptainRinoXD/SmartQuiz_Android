@@ -1,23 +1,35 @@
 package com.example.smartquiz.Model;
 
 import java.util.Date;
+import java.util.List;
 
 public class Exam {
     public String title;
     public String createdBy;
     public Date createdAt;
     public int duration;
-    private String sessionId;
+    private List<String> sessionId;
 
     
-    public Exam(String title, String createdBy, Date createdAt, int duration, String sessionId) {
+    
+    public Exam(String title, String createdBy, Date createdAt, int duration, List<String> sessionId) {
         this.title = title;
         this.createdBy = createdBy;
         this.createdAt = createdAt;
         this.duration = duration;
         this.sessionId = sessionId;
     }
+
     public Exam() {}
+
+    public List<String> getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(List<String> sessionId) {
+        this.sessionId = sessionId;
+    }
+    
     public String getTitle() {
         return title;
     }
@@ -50,13 +62,6 @@ public class Exam {
         this.duration = duration;
     }
 
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
 
 }
 
