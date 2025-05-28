@@ -4,6 +4,8 @@ import com.example.smartquiz.Model.Class;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,8 +13,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ClassController extends BaseController{
+public class ClassesController extends BaseController{
     public void createClass(Class newClass, OnCompleteListener<Void> listener) {
+        newClass.setCreatedBy(getCurrentUserId());
         String classId = db.collection("classes").document().getId();
         newClass.setId(classId);
         db.collection("classes").document(classId).set(newClass).addOnCompleteListener(listener);
@@ -20,6 +23,11 @@ public class ClassController extends BaseController{
 
     public void updateClass(Class updatedClass, OnCompleteListener<Void> listener) {
         db.collection("classes").document(updatedClass.getId()).set(updatedClass).addOnCompleteListener(listener);
+    }
+
+    public void getClassByCreatedBy(String userId, OnCompleteListener<QuerySnapshot> listener) {
+        Query query = db.collection("classes").whereEqualTo("createdBy", userId);
+        query.get().addOnCompleteListener(listener);
     }
 
     public void updateClassStudents(Class updatedClass, OnCompleteListener<Void> listener) {
