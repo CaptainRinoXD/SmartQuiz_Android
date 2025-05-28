@@ -36,19 +36,34 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <Button
-            android:id="@+id/btn_add_question"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Thêm câu hỏi" />
+            android:orientation="vertical"
+            android:padding="4dp">
 
-        <Button
-            android:id="@+id/btn_upload_exam"
+            <Button
+                android:id="@+id/btn_add_question"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Thêm câu hỏi" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Tải đề lên" />
+            android:orientation="vertical"
+            android:padding="4dp">
+
+            <Button
+                android:id="@+id/btn_upload_exam"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tải đề lên" />
+        </LinearLayout>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
