@@ -6,16 +6,15 @@ public class Class {
     private String id;
     private String name;
     public String createdBy;
-    private String description;
     private List<String> studentsId;
-   
-    public Class(String id, String name, String createdBy, String description, List<String> studentsId) {
-        this.id = id;
-        this.name = name;
-        this.createdBy = createdBy;
-        this.description = description;
+    public Class(List<String> studentsId, String createdBy, String name, String id) {
         this.studentsId = studentsId;
+        this.createdBy = createdBy;
+        this.name = name;
+        this.id = id;
     }
+
+
 
     public Class() {
         // Required for Firestore
@@ -39,12 +38,7 @@ public class Class {
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
-    }
+
     public List<String> getStudentsId() {
         return studentsId;
     }
