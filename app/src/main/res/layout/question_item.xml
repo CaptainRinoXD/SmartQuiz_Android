@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/question_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/border"
+    android:padding="12dp"
+    android:layout_marginBottom="12dp">
+
+    <!-- Câu hỏi -->
+    <EditText
+        android:id="@+id/edt_question_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nhập nội dung câu hỏi"
+        android:inputType="textMultiLine"
+        android:minLines="2"
+        android:textSize="16sp" />
+
+    <!-- Danh sách đáp án -->
+    <RadioGroup
+        android:id="@+id/radio_group_answers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="8dp">
+
+        <!-- Đáp án A -->
+        <RadioButton
+            android:id="@+id/radio_answer_0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đáp án A"
+            android:checked="true" />
+
+        <EditText
+            android:id="@+id/edt_answer_0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập đáp án A" />
+
+        <!-- Đáp án B -->
+        <RadioButton
+            android:id="@+id/radio_answer_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đáp án B" />
+
+        <EditText
+            android:id="@+id/edt_answer_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập đáp án B" />
+
+        <!-- Đáp án C -->
+        <RadioButton
+            android:id="@+id/radio_answer_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đáp án C" />
+
+        <EditText
+            android:id="@+id/edt_answer_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập đáp án C" />
+
+        <!-- Đáp án D -->
+        <RadioButton
+            android:id="@+id/radio_answer_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đáp án D" />
+
+        <EditText
+            android:id="@+id/edt_answer_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập đáp án D" />
+    </RadioGroup>
+
+</LinearLayout>
