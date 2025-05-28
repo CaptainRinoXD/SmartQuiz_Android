@@ -183,7 +183,7 @@
         </ScrollView>
 
         <ImageButton
-            android:id="@+id/add_btnClass"
+            android:id="@+id/add_btnStudent"
             android:layout_width="65dp"
             android:layout_height="65dp"
             android:layout_marginEnd="24dp"

@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 public class UserController extends BaseController {
@@ -134,5 +135,16 @@ public class UserController extends BaseController {
                 firestoreListener.onComplete(failedTask);
             }
         }
+    }
+
+    public void getUsersByEmailPrefixAndRole(String emailPrefix, OnCompleteListener<QuerySnapshot> listener) {
+        String endRange = emailPrefix + "\uf8ff";
+
+        db.collection("users")
+                .whereEqualTo("role", "Student") 
+                .whereGreaterThanOrEqualTo("email", emailPrefix) 
+                .whereLessThan("email", endRange) 
+                .get()
+                .addOnCompleteListener(listener);
     }
 }

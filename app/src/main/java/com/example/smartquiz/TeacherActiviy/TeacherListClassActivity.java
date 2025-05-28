@@ -32,7 +32,7 @@ public class TeacherListClassActivity extends AppCompatActivity {
         });
         Header_Controller_Teacher.setup(this);
 
-        createClassButton = findViewById(R.id.add_btnClass);
+        createClassButton = findViewById(R.id.add_btnStudent);
         createClassButton.setOnClickListener(v -> {
             Intent intent = new Intent(TeacherListClassActivity.this, TeacherAddClassActivity.class);
             startActivity(intent);
