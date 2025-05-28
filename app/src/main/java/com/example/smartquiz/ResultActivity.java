@@ -6,6 +6,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.smartquiz.Controller.SubmissionController;
@@ -19,7 +20,10 @@ public class ResultActivity extends AppCompatActivity {  // 🔧 PHẢI extends 
     protected void onCreate(@Nullable Bundle savedInstanceState) {  // 🔧 onCreate cần @Nullable
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
-
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
         TextView titleTextView = findViewById(R.id.examTitletextView);
         TextView scoreTextView = findViewById(R.id.examQuestiontextView);
         TextView durationTextView = findViewById(R.id.examDurationtextView);
@@ -36,8 +40,8 @@ public class ResultActivity extends AppCompatActivity {  // 🔧 PHẢI extends 
         SubmissionController submissionController = new SubmissionController();
         submissionController.getStudentSubmission(examId, submission -> {
             if (submission != null) {
-                scoreTextView.setText(String.format("%.1f / 20", submission.getScore()));
-                durationTextView.setText(formatDuration(submission.getDuration()));
+                scoreTextView.setText(String.valueOf(submission.getScore()));
+                durationTextView.setText(String.valueOf(submission.getDuration()));
 
                 // Lấy tên đề thi từ Firestore
                 FirebaseFirestore.getInstance()
@@ -57,9 +61,9 @@ public class ResultActivity extends AppCompatActivity {  // 🔧 PHẢI extends 
     }
 
     // ✅ Hàm định dạng thời gian từ giây sang phút:giây
-    private String formatDuration(int totalSeconds) {
-        int minutes = totalSeconds / 60;
-        int seconds = totalSeconds % 60;
-        return String.format("%02d phút %02d giây", minutes, seconds);
-    }
+//    private String formatDuration(int totalSeconds) {
+//        int minutes = totalSeconds / 60;
+//        int seconds = totalSeconds % 60;
+//        return String.format("%02d phút %02d giây", minutes, seconds);
+//    }
 }

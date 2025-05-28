@@ -66,7 +66,7 @@ public class TeacherAddClassActivity extends AppCompatActivity {
             return insets;
         });
         Header_Controller_Teacher.setup(this);
-        submitClassBtn = findViewById(R.id.submitClassBtn);
+        submitClassBtn = findViewById(R.id.submit_create_ExamBtn);
         cancelClassBtn = findViewById(R.id.cancelClassBtn);
         add_btnStudent = findViewById(R.id.add_btnStudent);
         studentToAddList = findViewById(R.id.studentToAddList);

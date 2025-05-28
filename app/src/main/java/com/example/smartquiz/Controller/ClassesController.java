@@ -25,7 +25,8 @@ public class ClassesController extends BaseController{
         db.collection("classes").document(updatedClass.getId()).set(updatedClass).addOnCompleteListener(listener);
     }
 
-    public void getClassByCreatedBy(String userId, OnCompleteListener<QuerySnapshot> listener) {
+    public void getClassByCreatedBy( OnCompleteListener<QuerySnapshot> listener) {
+        String userId = getCurrentUserId();
         Query query = db.collection("classes").whereEqualTo("createdBy", userId);
         query.get().addOnCompleteListener(listener);
     }
