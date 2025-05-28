@@ -69,7 +69,7 @@ public class TeacherAddClassActivity extends AppCompatActivity {
         submitClassBtn = findViewById(R.id.submit_create_ExamBtn);
         cancelClassBtn = findViewById(R.id.cancelClassBtn);
         add_btnStudent = findViewById(R.id.add_btnStudent);
-        studentToAddList = findViewById(R.id.studentToAddList);
+        studentToAddList = findViewById(R.id.exam_list);
         emptyStateTextView = findViewById(R.id.emptyStateTextView);
         classNameText = findViewById(R.id.classNameText);
 

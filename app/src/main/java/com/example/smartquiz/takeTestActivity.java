@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +46,9 @@ public class takeTestActivity extends AppCompatActivity {
     private List<Question> questionList;
     private LoadingDialogFragment loadingDialog;
     private int durationInMinutes;
+    private ScrollView mainScrollView;
+    private boolean AllAnswered;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +67,7 @@ public class takeTestActivity extends AppCompatActivity {
         questionsLinearLayout = findViewById(R.id.questionsLinearLayout);
         textViewDuration = findViewById(R.id.duration);
         submitButton = findViewById(R.id.imageButton7);
+        mainScrollView = findViewById(R.id.scrollView3);
         questionList = new ArrayList<>();
 
         Intent intent = getIntent();
@@ -77,8 +82,10 @@ public class takeTestActivity extends AppCompatActivity {
         }
 
         submitButton.setOnClickListener(view -> {
-            showLoading(true);
             submissionExam(examId);
+            if(AllAnswered) {
+                showLoading(true);
+            }
         });
     }
 
@@ -147,6 +154,7 @@ public class takeTestActivity extends AppCompatActivity {
         Submission submission = new Submission();
         submission.setExamId(examId);
         List<SubmissionAnswer> answers = new ArrayList<>();
+        
 
         for (int i = 0; i < questionsLinearLayout.getChildCount(); i++) {
             View child = questionsLinearLayout.getChildAt(i);
@@ -156,8 +164,11 @@ public class takeTestActivity extends AppCompatActivity {
                 String questionId = (String) radioGroup.getTag(); //get question id from tag
                 Log.d(TAG, "Question ID from radioTag: " + questionId);
                 int selectedRadioButtonId = radioGroup.getCheckedRadioButtonId();
-
+                if(selectedRadioButtonId == -1) {
+                    showLoading(false);
+                }
                 if (selectedRadioButtonId != -1) {
+                    AllAnswered = true;
                     RadioButton selectedRadioButton = findViewById(selectedRadioButtonId);
                     SubmissionAnswer submissionAnswer = new SubmissionAnswer();
                     submissionAnswer.setQuestionId(questionId); //setting the same id for subAnswers
@@ -168,12 +179,24 @@ public class takeTestActivity extends AppCompatActivity {
                     answers.add(submissionAnswer);
 
                 } else {
-                    SubmissionAnswer submissionAnswer = new SubmissionAnswer(); 
-                    submissionAnswer.setQuestionId(questionId);
-                    submissionAnswer.setSelectedAnswerIndex(-1); // Indicate no answer selected
-                    answers.add(submissionAnswer);
+//                    SubmissionAnswer submissionAnswer = new SubmissionAnswer();
+//                    submissionAnswer.setQuestionId(questionId);
+//                    submissionAnswer.setSelectedAnswerIndex(-1); // Indicate no answer selected
+//                    answers.add(submissionAnswer);
+//                    OLD LOGIC FOR HANDELING NO ANSWER SELECTED
+                   
+                    if (mainScrollView != null) {
+                        final RadioGroup targetRadioGroup = radioGroup;
+                        mainScrollView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(takeTestActivity.this, "Please select an answer", Toast.LENGTH_SHORT).show();
+                                mainScrollView.smoothScrollTo(0, targetRadioGroup.getTop());
+                            }
+                        });
+                    }
+                    return;
                 }
-
             }
         }
         submission.setAnswers(answers);
@@ -185,8 +208,8 @@ public class takeTestActivity extends AppCompatActivity {
 
         SubmissionController submissionController = new SubmissionController();
         submissionController.submitExam(submission, durationInMinutes, task -> {
+            showLoading(false);
             if (task.isSuccessful()) {
-                showLoading(false);
                 Log.d(TAG, "Exam submitted successfully");
                 Toast.makeText(takeTestActivity.this, "Exam submitted successfully", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(takeTestActivity.this, ResultActivity.class);
