@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.smartquiz.TeacherActiviy.TeacherAddExamManualActivity;
 import com.example.smartquiz.TeacherActiviy.TeacherListClassActivity;
 import com.example.smartquiz.TeacherActiviy.TeacherMainActivity;
 
@@ -38,6 +39,12 @@ public class Header_Controller_Teacher {
             Intent intent = new Intent(activity, TeacherListClassActivity.class);
             activity.startActivity(intent);
         });
+
+        createTest.setOnClickListener(v -> {
+            Intent intent = new Intent(activity, TeacherAddExamManualActivity.class);
+            activity.startActivity(intent);
+        });
+
 //        takeTestButton.setOnClickListener(v -> {
 //            Intent intent = new Intent(activity, ListTestActivity.class);
 //            activity.startActivity(intent);
