@@ -11,8 +11,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout4"
-        android:layout_width="377dp"
-        android:layout_height="442dp"
+        android:layout_width="375dp"
+        android:layout_height="607dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -50,7 +50,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
-            android:id="@+id/classNameText"
+            android:id="@+id/ExamNameText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -65,18 +65,34 @@
             app:layout_constraintTop_toBottomOf="@+id/textView14" />
 
         <TextView
+            android:id="@+id/textViewSelectDateTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/border"
+            android:gravity="center_vertical"
+            android:hint="Chọn ngày và giờ"
+            android:padding="10dp"
+            android:textSize="26sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ExamNameText" />
+
+        <TextView
             android:id="@+id/textView15"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:fontFamily="@font/be_vietnam_pro_light_italic"
-            android:text="Thêm học sinh:"
+            android:text="Chọn học sinh:"
             android:textColor="@color/teal_700"
             android:textSize="26sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/classNameText" />
+            app:layout_constraintTop_toBottomOf="@+id/textViewSelectDateTime" />
 
         <TextView
             android:id="@+id/emptyStateTextView"
@@ -100,8 +116,8 @@
 
         <ScrollView
             android:id="@+id/scrollView4"
-            android:layout_width="350dp"
-            android:layout_height="196dp"
+            android:layout_width="347dp"
+            android:layout_height="280dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="16dp"
@@ -111,35 +127,22 @@
             android:translationZ="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.6"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView15"
-            app:layout_constraintVertical_bias="0.0">
+            app:layout_constraintVertical_bias="0.076">
 
             <LinearLayout
-                android:id="@+id/exam_list"
+                android:id="@+id/list_exam_dialog"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:orientation="vertical">
+
+            </LinearLayout>
         </ScrollView>
 
-        <ImageButton
-            android:id="@+id/add_btnStudent"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            android:layout_marginEnd="20sp"
-            android:layout_marginBottom="10sp"
-            android:background="@drawable/circle"
-            android:contentDescription="Add New Item"
-            android:elevation="6dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/baseline_add_24"
-            android:translationZ="6dp"
-            app:layout_constraintBottom_toBottomOf="@+id/scrollView4"
-            app:layout_constraintEnd_toEndOf="parent" />
-
         <Button
-            android:id="@+id/submit_create_ExamBtn"
+            android:id="@+id/submit_create_SessionBtn2"
             android:layout_width="151dp"
             android:layout_height="56dp"
             android:background="@drawable/green_box"
@@ -149,6 +152,22 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/scrollView4" />
+
+        <Button
+            android:id="@+id/randomBtn"
+            android:layout_width="117dp"
+            android:layout_height="54dp"
+            android:layout_marginTop="6sp"
+            android:background="@drawable/light_blue"
+            android:text="random"
+            android:textColor="@color/black"
+            app:backgroundTint="@null"
+            app:layout_constraintBottom_toTopOf="@+id/scrollView4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.419"
+            app:layout_constraintStart_toEndOf="@+id/textView15"
+            app:layout_constraintTop_toBottomOf="@+id/textViewSelectDateTime"
+            app:layout_constraintVertical_bias="0.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

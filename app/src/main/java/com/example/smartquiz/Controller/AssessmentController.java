@@ -1,10 +1,16 @@
 package com.example.smartquiz.Controller;
+import android.util.Log;
+
 import com.example.smartquiz.Model.Assessment;
 import com.example.smartquiz.Model.AssessmentSession;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
 
@@ -16,30 +22,56 @@ import java.util.stream.Collectors;
 public class AssessmentController extends BaseController{
     public void createAssessment(Assessment assessment, OnCompleteListener<Void> listener) {
         String id = db.collection("Assessment").document().getId();
+        assessment.setId(id);
         db.collection("Assessment").document(id).set(assessment)
                 .addOnCompleteListener(listener);
     }
 
     public void addSession(String assessmentId, AssessmentSession session,
-            OnSuccessListener<DocumentReference> listener) {
-        db.collection("Assessment")
+                           OnSuccessListener<DocumentReference> listener, OnFailureListener failureListener) {
+        String sessionId = db.collection("Assessment").document(assessmentId).collection("session").document().getId();
+        session.setId(sessionId);
+        DocumentReference sessionRef = db.collection("Assessment")
                 .document(assessmentId)
                 .collection("session")
-                .add(session)
-                .addOnSuccessListener(listener);
+                .document(sessionId);
+        sessionRef.set(session)
+                .addOnSuccessListener(aVoid -> listener.onSuccess(sessionRef))
+                .addOnFailureListener(failureListener);
     }
 
     public void getAllAssessments(OnSuccessListener<QuerySnapshot> listener) {
         db.collection("Assessment").get().addOnSuccessListener(listener);
     }
 
+    public void getAssessmentsByClassId(String classId, OnSuccessListener<QuerySnapshot> listener){
+        db.collection("Assessment")
+                .whereArrayContains("classId", classId)
+                .get()
+                .addOnSuccessListener(listener);
+    }
+
+    public void getAssessmentsByClassIdEventLis(String classId, EventListener<QuerySnapshot> listener){
+        db.collection("Assessment")
+                .whereArrayContains("classId", classId)
+                .addSnapshotListener(listener);
+    }
+
     // Lấy tất cả session theo assessment
-    public void getAllSessions(String assessmentId, OnSuccessListener<QuerySnapshot> listener) {
+    public void getAllSessions(String assessmentId, EventListener<QuerySnapshot> listener) {
         db.collection("Assessment")
                 .document(assessmentId)
                 .collection("session")
-                .get()
-                .addOnSuccessListener(listener);
+                .addSnapshotListener(listener);
+    }
+
+    // Lấy session theo assessment va Id
+    public void getSessionsById(String assessmentId,String SessionId, EventListener<DocumentSnapshot> listener) {
+        db.collection("Assessment")
+                .document(assessmentId)
+                .collection("session")
+                .document(SessionId)
+                .addSnapshotListener(listener);
     }
 
     /**
@@ -101,6 +133,33 @@ public class AssessmentController extends BaseController{
                         }
                     }
                     listener.onSuccess(result);
+                });
+    }
+
+    public ListenerRegistration listenForUnselectedStudents(String assessmentId,boolean getALL, EventListener<List<Assessment.StudentInfo>> listener) {
+        return db.collection("Assessment").document(assessmentId)
+                .addSnapshotListener((snapshot, e) -> {
+                    if (e != null) {
+                        listener.onEvent(null, e);
+                        return;
+                    }
+
+                    List<Assessment.StudentInfo> result = new ArrayList<>();
+                    if (snapshot != null && snapshot.exists()) {
+                        Assessment assess = snapshot.toObject(Assessment.class);
+                        if (assess != null && assess.getStudent() != null) {
+                            Log.d("AssessmentController", "Found " + assess.getStudent().size()+ " students in assessment " + assessmentId + ", getALL=" + getALL);
+                            for (Assessment.StudentInfo s : assess.getStudent()) {
+                                if (!s.isSelected() && !getALL) {
+                                    result.add(s);
+                                } else if (getALL) {
+                                    result.add(s);
+                                }
+                            }
+                        }
+                    }
+
+                    listener.onEvent(result, null);
                 });
     }
 
@@ -168,6 +227,23 @@ public class AssessmentController extends BaseController{
 
 
     /// Assessment Session Section
+
+    public void updateSession(
+            String assessmentId,
+            String sessionId,
+            AssessmentSession updatedSession,
+            OnCompleteListener<Void> listener) {
+
+        DocumentReference sessionRef = db.collection("Assessment")
+                .document(assessmentId)
+                .collection("session")
+                .document(sessionId);
+
+        // Use set() to replace the existing document with the updated data
+        sessionRef.set(updatedSession)
+                .addOnCompleteListener(listener);
+    }
+
     /**
      * Thêm các userId vào studentsInSession (chỉ thêm những ID hợp lệ).
      * @param assessmentId ID của Assessment

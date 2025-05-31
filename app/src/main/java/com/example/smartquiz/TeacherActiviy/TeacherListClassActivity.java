@@ -41,14 +41,18 @@ public class TeacherListClassActivity extends AppCompatActivity {
         Header_Controller_Teacher.setup(this);
         emptyStateTextView = findViewById(R.id.emptyStateTextView);
 
-        createClassButton = findViewById(R.id.add_btnStudent);
+        createClassButton = findViewById(R.id.add_btn_student_session);
         createClassButton.setOnClickListener(v -> {
             Intent intent = new Intent(TeacherListClassActivity.this, TeacherAddClassActivity.class);
             startActivity(intent);
         });
 
+
+        scroll_view_class_list = findViewById(R.id.scroll_view_assessment_list);
+        fetchDisplayClassEventLis();
+    }
+    private void fetchDisplayClass() {
         ClassesController classesController = new ClassesController();
-        scroll_view_class_list = findViewById(R.id.scroll_view_class_list);
         classesController.getClassByCreatedBy(task->{
             if (task.isSuccessful()) {
                 emptyStateTextView.setVisibility(View.GONE);
@@ -61,9 +65,24 @@ public class TeacherListClassActivity extends AppCompatActivity {
         });
     }
 
+    private void fetchDisplayClassEventLis() {
+        ClassesController classesController = new ClassesController();
+        classesController.getClassByCreatedByEventLis((value, error)->{
+            if (value != null) {
+                scroll_view_class_list.removeAllViews();
+                emptyStateTextView.setVisibility(View.GONE);
+                for (DocumentSnapshot document : value.getDocuments()) {
+                    Class aClass = document.toObject(Class.class);
+                    if(aClass ==null) {return;}
+                    addClassToLN(aClass);
+                }
+            }
+        });
+    }
+
     private void addClassToLN(Class aClass) {
-        TextView examTextView = new TextView(this);
-        examTextView.setText("Lớp: " + aClass.getName());
+        TextView classTextView = new TextView(this);
+        classTextView.setText("Lớp: " + aClass.getName());
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -72,17 +91,24 @@ public class TeacherListClassActivity extends AppCompatActivity {
         int paddingPx = dpToPx(16);
 
         params.setMargins(paddingPx, marginVerticalPx, paddingPx, marginVerticalPx);
-        examTextView.setLayoutParams(params);
+        classTextView.setLayoutParams(params);
 
-        examTextView.setBackgroundResource(R.drawable.light_blue);
+        classTextView.setBackgroundResource(R.drawable.light_blue);
 
 
-        examTextView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
-        scroll_view_class_list.addView(examTextView);
-        examTextView.setOnClickListener(v -> {
-//            Intent intent = new Intent(TeacherListClassActivity.this, TeacherListStudentActivity.class);
-//            intent.putExtra("CLASS_ID", aClass.getId());
-//            startActivity(intent);
+        classTextView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+        scroll_view_class_list.addView(classTextView);
+        classTextView.setOnClickListener(v -> {
+           Intent intent = new Intent(TeacherListClassActivity.this, TeacherListAssessmentActivity.class);
+           intent.putExtra("CLASS_ID", aClass.getId());
+           startActivity(intent);
+        });
+        classTextView.setOnLongClickListener(v->{
+            Intent intent = new Intent(TeacherListClassActivity.this, TeacherAddClassActivity.class);
+            intent.putExtra("isUpdate",true);
+            intent.putExtra("CLASS_ID", aClass.getId());
+            startActivity(intent);
+            return true;
         });
     }
 

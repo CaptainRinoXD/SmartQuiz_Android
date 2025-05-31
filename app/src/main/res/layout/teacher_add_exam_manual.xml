@@ -2,20 +2,44 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <!-- ScrollView chứa danh sách câu hỏi -->
+
+    <!-- Layout chứa 2 nút Thêm câu hỏi và Tải đề -->
+    <LinearLayout
+        android:layout_width="411dp"
+        android:layout_height="60dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/scrollViewQuestions"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/btn_upload_exam"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tải đề lên bằng file Office Word" />
+
+    </LinearLayout>
+
     <ScrollView
         android:id="@+id/scrollViewQuestions"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="405dp"
+        android:layout_height="673dp"
         android:fillViewport="true"
         android:padding="8dp"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/layout_buttons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.914">
 
         <LinearLayout
             android:id="@+id/question_container"
@@ -24,7 +48,6 @@
             android:orientation="vertical" />
     </ScrollView>
 
-    <!-- Layout chứa 2 nút Thêm câu hỏi và Tải đề -->
     <LinearLayout
         android:id="@+id/layout_buttons"
         android:layout_width="0dp"
@@ -58,7 +81,7 @@
             android:padding="4dp">
 
             <Button
-                android:id="@+id/btn_upload_exam"
+                android:id="@+id/btn_submit_exam"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Tải đề lên" />

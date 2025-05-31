@@ -39,6 +39,7 @@ public class takeTestActivity extends AppCompatActivity {
     private static final String TAG = "takeTestActivity";
 
     private String examId;
+    private String assessmentId;
     private TextView textViewDuration;
     private LinearLayout questionsLinearLayout;
     private ImageButton submitButton;
@@ -74,6 +75,7 @@ public class takeTestActivity extends AppCompatActivity {
         Bundle extras = intent.getExtras();
         if (extras != null) {
             examId = extras.getString("examId");
+            assessmentId = extras.getString("ASSESSMENT_ID");
             Log.d(TAG, "Received exam id: " + examId);
             fetchExamQuesion(examId);
             fetchExamDetail(examId);
@@ -153,6 +155,7 @@ public class takeTestActivity extends AppCompatActivity {
     private void submissionExam(String examId ) {
         Submission submission = new Submission();
         submission.setExamId(examId);
+        submission.setAssessmentId(assessmentId);
         List<SubmissionAnswer> answers = new ArrayList<>();
         
 

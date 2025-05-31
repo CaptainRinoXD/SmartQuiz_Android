@@ -127,26 +127,85 @@
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
         <TextView
-            android:id="@+id/textView13"
+            android:id="@+id/assessment_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/light_blue"
             android:fontFamily="@font/be_vietnam_pro_light_italic"
-            android:text="-Tạo ca-"
-            android:textColor="@android:color/holo_blue_dark"
+            android:paddingLeft="12sp"
+            android:paddingRight="12sp"
+            android:text="Tên kì thi:"
+            android:textColor="@color/teal_700"
             android:textSize="28sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.93"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/emptyStateTextView"
+            android:layout_width="200sp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="120dp"
+            android:gravity="center"
+            android:text="Chưa có đề thi nào trong danh sách."
+            android:textColor="#888888"
+            android:textSize="20sp"
+            android:textStyle="italic"
+            app:layout_constraintBottom_toBottomOf="@+id/scrollView4"
+            app:layout_constraintEnd_toEndOf="@+id/scrollView4"
+            app:layout_constraintStart_toStartOf="@+id/scrollView4"
+            app:layout_constraintTop_toTopOf="@+id/scrollView4"
+            app:layout_constraintVertical_bias="0.0"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/emptyStateTextView1"
+            android:layout_width="200sp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:gravity="center"
+            android:text="Chưa có ca thi nào trong danh sách."
+            android:textColor="#888888"
+            android:textSize="20sp"
+            android:textStyle="italic"
+            app:layout_constraintBottom_toBottomOf="@+id/scrollView5"
+            app:layout_constraintEnd_toEndOf="@+id/scrollView5"
+            app:layout_constraintStart_toStartOf="@+id/scrollView5"
+            app:layout_constraintTop_toTopOf="@+id/scrollView5"
+            app:layout_constraintVertical_bias="0.0"
+            tools:visibility="visible" />
+
+        <ScrollView
+            android:id="@+id/scrollView5"
+            android:layout_width="380dp"
+            android:layout_height="183dp"
+            android:background="@drawable/border"
+            android:elevation="6dp"
+            android:translationZ="6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.387"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView14"
+            app:layout_constraintVertical_bias="0.005">
+
+            <LinearLayout
+                android:id="@+id/session_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                tools:layout_editor_absoluteX="15dp"
+                tools:layout_editor_absoluteY="151dp" />
+        </ScrollView>
 
         <TextView
             android:id="@+id/textView14"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="100dp"
             android:fontFamily="@font/be_vietnam_pro_light_italic"
             android:text="Danh sách ca:"
             android:textColor="@color/teal_700"
@@ -154,6 +213,61 @@
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:fontFamily="@font/be_vietnam_pro_light_italic"
+            android:text="-Ca Thi-"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.941"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ScrollView
+            android:id="@+id/scrollView4"
+            android:layout_width="377dp"
+            android:layout_height="243dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/border"
+            android:elevation="6dp"
+            android:translationZ="6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView15"
+            app:layout_constraintVertical_bias="0.0">
+
+            <LinearLayout
+                android:id="@+id/list_exam_dialog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/textView13"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/be_vietnam_pro_light_italic"
+            android:text="-Đề Thi-"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.931"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/scrollView5"
+            app:layout_constraintVertical_bias="0.087" />
 
         <TextView
             android:id="@+id/textView15"
@@ -165,53 +279,12 @@
             android:textColor="@color/teal_700"
             android:textSize="26sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="253dp" />
-
-        <TextView
-            android:id="@+id/emptyStateTextView"
-            android:layout_width="200sp"
-            android:layout_height="wrap_content"
-            android:text="Chưa có học sinh nào trong danh sách."
-            android:gravity="center"
-            android:textStyle="italic"
-            android:textColor="#888888"
-            android:textSize="20sp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="120dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/textView13"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView15"
-            app:layout_constraintVertical_bias="0.0"
-            tools:visibility="visible" />
-
-        <ScrollView
-            android:id="@+id/scrollView4"
-            android:layout_width="377dp"
-            android:layout_height="296dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/border"
-            android:elevation="6dp"
-            android:translationZ="6dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView15"
-            app:layout_constraintVertical_bias="0.0">
-
-            <LinearLayout
-                android:id="@+id/exam_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
-        </ScrollView>
+            app:layout_constraintTop_toBottomOf="@+id/scrollView5"
+            app:layout_constraintVertical_bias="0.097" />
 
         <ImageButton
             android:id="@+id/add_btnSession"
@@ -243,51 +316,6 @@
             app:layout_constraintBottom_toBottomOf="@+id/scrollView4"
             app:layout_constraintEnd_toEndOf="@+id/scrollView4" />
 
-        <Button
-            android:id="@+id/submit_create_ExamBtn"
-            android:layout_width="151dp"
-            android:layout_height="56dp"
-            android:layout_marginStart="28dp"
-            android:text="Tạo"
-            app:backgroundTint="@null"
-            android:background="@drawable/green_box"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/cancelClassBtn"
-            app:layout_constraintTop_toBottomOf="@+id/scrollView4" />
-
-        <Button
-            android:id="@+id/cancelClassBtn"
-            android:layout_width="151dp"
-            android:layout_height="56dp"
-            android:layout_marginStart="40dp"
-            android:text="Thoát"
-            app:backgroundTint="@null"
-            android:background="@drawable/red_box"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/scrollView4" />
-
-        <ScrollView
-            android:id="@+id/scrollView5"
-            android:layout_width="375dp"
-            android:layout_height="160dp"
-            android:background="@drawable/border"
-            android:elevation="6dp"
-            android:translationZ="6dp"
-            app:layout_constraintBottom_toTopOf="@+id/textView15"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView14"
-            app:layout_constraintVertical_bias="0.434">
-
-            <LinearLayout
-                android:id="@+id/session_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
-        </ScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

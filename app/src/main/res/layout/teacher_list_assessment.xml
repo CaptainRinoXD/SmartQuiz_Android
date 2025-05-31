@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:id="@+id/main"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <!-- Header ConstraintLayout -->
     <LinearLayout
@@ -119,11 +119,11 @@
 
     <!-- Main Content Area: Contains TextView, ScrollView, and the floating Button -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="413dp"
+        android:layout_height="760dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
         app:layout_constraintVertical_bias="0.0">
@@ -164,8 +164,8 @@
 
         <ScrollView
             android:id="@+id/scrollView2"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="387dp"
+            android:layout_height="683dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
@@ -177,15 +177,16 @@
             app:layout_constraintTop_toBottomOf="@+id/textView12">
 
             <LinearLayout
-                android:id="@+id/scroll_view_class_list"
+                android:id="@+id/scroll_view_assessment_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="15sp"
                 android:orientation="vertical"
                 tools:context=".MainActivity" />
         </ScrollView>
 
         <ImageButton
-            android:id="@+id/add_btnClass"
+            android:id="@+id/add_btnAssessment"
             android:layout_width="65dp"
             android:layout_height="65dp"
             android:layout_marginEnd="24dp"

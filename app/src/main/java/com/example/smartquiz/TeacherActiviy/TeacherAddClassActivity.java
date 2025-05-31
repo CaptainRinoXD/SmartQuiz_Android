@@ -68,26 +68,62 @@ public class TeacherAddClassActivity extends AppCompatActivity {
         Header_Controller_Teacher.setup(this);
         submitClassBtn = findViewById(R.id.submit_create_ExamBtn);
         cancelClassBtn = findViewById(R.id.cancelClassBtn);
-        add_btnStudent = findViewById(R.id.add_btnStudent);
-        studentToAddList = findViewById(R.id.exam_list);
+        add_btnStudent = findViewById(R.id.add_btn_student_session);
+        studentToAddList = findViewById(R.id.list_exam_dialog);
         emptyStateTextView = findViewById(R.id.emptyStateTextView);
-        classNameText = findViewById(R.id.classNameText);
+        classNameText = findViewById(R.id.ExamNameText);
 
         studentArayList = new ArrayList<>();
         studentArrayListString = new ArrayList<>();
+
+        boolean isUpdate = getIntent().getBooleanExtra("isUpdate", false);
+        if(isUpdate) {
+            submitClassBtn.setText("Cập nhật");
+            isUpdateClasses();
+        }
 
         add_btnStudent.setOnClickListener(v -> {
             showAddStudentDialog();
         });
 
         submitClassBtn.setOnClickListener(v->{
-            summitCreateClass();
+            summitCreateClass(isUpdate);
         });
-       
+
+
 
     }
 
-    private void summitCreateClass() {
+    private void isUpdateClasses() {
+        String classId = getIntent().getStringExtra("CLASS_ID");
+        ClassesController classesController = new ClassesController();
+        classesController.getClassDocumentById(classId, (task) -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot classDoc = task.getResult();
+                Class currClass = classDoc.toObject(Class.class);
+                classNameText.setText(currClass.getName());
+                if (currClass == null) {
+                    Log.d(TAG, "Class is null");
+                    return;
+                }
+                UserController userController = new UserController();
+                for (String studentId : currClass.getStudentsId()) {
+                    userController.getUserIdDocument(studentId, (value,error) -> {
+                        if(value != null) {
+                            User student = value.toObject(User.class);
+                            if( student != null) {
+                                studentArayList.add(student);
+                                refreshStudentList();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+
+    private void summitCreateClass(boolean isUpdate) {
         String className = classNameText.getText().toString();
         if (className.isEmpty() || studentArrayListString.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập tên lớp.", Toast.LENGTH_SHORT).show();
@@ -95,43 +131,32 @@ public class TeacherAddClassActivity extends AppCompatActivity {
         } else {
             ClassesController newClassroom = new ClassesController();
             Class newClass = new Class();
-            newClass.setName(className);
-            newClass.setStudentsId(studentArrayListString);
-            newClassroom.createClass(newClass, task ->{
-                if (task.isSuccessful()) {
-                    Toast.makeText(this, "Tạo lớp thành công.", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "Tạo lớp thất bại.", Toast.LENGTH_SHORT).show();
-                }
-            });
-            finish();
-        }
-    }
-
-    private void refreshStudentList() {
-        studentToAddList.removeAllViews();
-        studentArrayListString.clear();
-        if (studentArayList != null) {
-            emptyStateTextView.setVisibility(View.GONE);
-            for (User student : studentArayList) {
-                if(student.getName()==null){return;}
-                String name = student.getName();
-                TextView studentTextView = new TextView(this);
-                LinearLayout.LayoutParams questionParams = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                questionParams.setMargins(16, 32, 16, 8);
-                studentTextView.setLayoutParams(questionParams);
-                studentTextView.setText("Học sinh: "+name);
-                studentTextView.setTextSize(20);
-                studentTextView.setTypeface(null, Typeface.ITALIC);
-                studentTextView.setTextColor(Color.BLACK);
-
-                if(student.getUid() != null){
-                    studentArrayListString.add(student.getUid());
-                }
-                studentToAddList.addView(studentTextView);
+            if(isUpdate) {
+                String classId = getIntent().getStringExtra("CLASS_ID");
+                newClass.setId(classId);
+                newClass.setName(className);
+                newClass.setStudentsId(studentArrayListString);
+                newClassroom.updateClass(newClass, task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(this, "Cập nhật lớp thành công.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Cập nhật lớp thất bại.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                finish();
+            } else {
+                newClass.setName(className);
+                newClass.setStudentsId(studentArrayListString);
+                newClassroom.createClass(newClass, task ->{
+                    if (task.isSuccessful()) {
+                        Toast.makeText(this, "Tạo lớp thành công.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Tạo lớp thất bại.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                finish();
             }
+
         }
     }
 
@@ -222,7 +247,7 @@ public class TeacherAddClassActivity extends AppCompatActivity {
         buttonAddStudent.setOnClickListener(v -> {
             //String studentEmail = editTextStudentEmail.getText().toString().trim();
             RadioGroup searchResultsRadioGroup = null;
-            if (dialogStudentListLayout.getChildCount() > 0) {
+             if (dialogStudentListLayout.getChildCount() > 0) {
                 View firstChild = dialogStudentListLayout.getChildAt(0);
                 if (firstChild instanceof RadioGroup) {
                     searchResultsRadioGroup = (RadioGroup) firstChild;
@@ -236,7 +261,7 @@ public class TeacherAddClassActivity extends AppCompatActivity {
             if (selectedRadioButtonId != -1) {
                 RadioButton selectedRadioButton = dialogView.findViewById(selectedRadioButtonId);
                 if(selectedRadioButton == null) {Log.d(TAG, "selectedRadioButton is null");return;}
-                User selectedUser = (User) selectedRadioButton.getTag();
+                User selectedUser = (User) selectedRadioButton.getTag(); //passing User Model in tag
                 String selectedUserId = selectedUser.getUid();
                 String selectedUserEmail = selectedUser.getEmail();
 
@@ -266,5 +291,32 @@ public class TeacherAddClassActivity extends AppCompatActivity {
         });
 
         dialog.show();
+    }
+
+    private void refreshStudentList() {
+        studentToAddList.removeAllViews();
+        studentArrayListString.clear();
+        if (studentArayList != null) {
+            emptyStateTextView.setVisibility(View.GONE);
+            for (User student : studentArayList) {
+                if(student.getName()==null){return;}
+                String name = student.getName();
+                TextView studentTextView = new TextView(this);
+                LinearLayout.LayoutParams questionParams = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                questionParams.setMargins(16, 32, 16, 8);
+                studentTextView.setLayoutParams(questionParams);
+                studentTextView.setText("Học sinh: "+name);
+                studentTextView.setTextSize(20);
+                studentTextView.setTypeface(null, Typeface.ITALIC);
+                studentTextView.setTextColor(Color.BLACK);
+
+                if(student.getUid() != null){
+                    studentArrayListString.add(student.getUid());
+                }
+                studentToAddList.addView(studentTextView);
+            }
+        }
     }
 }

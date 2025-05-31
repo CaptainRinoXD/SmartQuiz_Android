@@ -7,6 +7,16 @@ public class AssessmentSession {
     private String title;
     private Date time;
     private List<String> studentsInSession;
+    private String id;
+
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public AssessmentSession() {
         // Required by Firestore

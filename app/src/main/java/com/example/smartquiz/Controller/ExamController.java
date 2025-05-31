@@ -2,11 +2,14 @@ package com.example.smartquiz.Controller;
 
 import android.util.Log;
 
+import com.example.smartquiz.Model.AssessmentSession;
 import com.example.smartquiz.Model.Exam;
 import com.example.smartquiz.Model.Question;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -14,14 +17,17 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 
 public class ExamController extends BaseController {
     public void createExam(Exam exam, List<Question> questions, OnCompleteListener<Void> listener) {
         String examId = db.collection("exams").document().getId();
         exam.setCreatedAt(new Date());
         exam.setCreatedBy(getCurrentUserId());
+        exam.setId(examId);
 
         DocumentReference examRef = db.collection("exams").document(examId);
         examRef.set(exam).addOnSuccessListener(unused -> {
@@ -85,12 +91,136 @@ public class ExamController extends BaseController {
         db.collection("exams").addSnapshotListener(listener);
     }
 
+    @FunctionalInterface
+    public interface SessionResultCallback {
+        void onResult(List<AssessmentSession> sessions, Exception error);
+    }
+
+    public void fetchSessionsForCurrentStudent(SessionResultCallback callback) {
+        String userId = getCurrentUserId();
+
+        db.collectionGroup("session")
+                .whereArrayContains("studentsInSession", userId)
+                .get()
+                .addOnSuccessListener(sessionSnap -> {
+                    List<AssessmentSession> sessions = new ArrayList<>();
+
+                    for (DocumentSnapshot doc : sessionSnap.getDocuments()) {
+                        AssessmentSession session = doc.toObject(AssessmentSession.class);
+                        if (session != null) {
+                            session.setId(doc.getId()); // Set document ID
+                            sessions.add(session);
+                        }
+                    }
+
+                    callback.onResult(sessions, null);
+                })
+                .addOnFailureListener(e -> callback.onResult(null, e));
+    }
+
+    @FunctionalInterface
+    public interface ExamResultCallback {
+        void onResult(List<Exam> exams, Exception error);
+    }
+
+    public void fetchExamsBySessionIds(List<String> sessionIds, ExamResultCallback callback) {
+        if (sessionIds == null || sessionIds.isEmpty()) {
+            callback.onResult(new ArrayList<>(), null);
+            return;
+        }
+
+        List<Task<QuerySnapshot>> examTasks = new ArrayList<>();
+
+        for (String sessionId : sessionIds) {
+            Task<QuerySnapshot> task = db.collection("exams")
+                    .whereArrayContains("sessionId", sessionId)
+                    .get();
+            examTasks.add(task);
+        }
+
+        Tasks.whenAllSuccess(examTasks)
+                .addOnSuccessListener(results -> {
+                    List<Exam> allExams = new ArrayList<>();
+
+                    for (Object o : results) {
+                        QuerySnapshot qs = (QuerySnapshot) o;
+                        for (DocumentSnapshot d : qs) {
+                            Exam exam = d.toObject(Exam.class);
+                            if (exam != null) {
+                                exam.setId(d.getId()); // Set document ID if needed
+                                allExams.add(exam);
+                            }
+                        }
+                    }
+
+                    callback.onResult(allExams, null);
+                })
+                .addOnFailureListener(e -> callback.onResult(null, e));
+    }
+
+//    @FunctionalInterface
+//    public interface ExamResultCallback {
+//        void onResult(List<Exam> exams, Exception error);
+//    }
+//
+//    public void fetchExamsForCurrentStudent(ExamResultCallback callback) {
+//        String userId = getCurrentUserId();
+//
+//        // Query all subcollections named "session"
+//        db.collectionGroup("session")
+//                .whereArrayContains("studentsInSession", userId)
+//                .get()
+//                .addOnSuccessListener(sessionSnap -> {
+//                    List<AssessmentSession> sessions = new ArrayList<>();
+//                    List<Task<QuerySnapshot>> examTasks = new ArrayList<>();
+//
+//                    for (DocumentSnapshot doc : sessionSnap.getDocuments()) {
+//                        AssessmentSession session = doc.toObject(AssessmentSession.class);
+//                        if (session != null) {
+//                            session.setId(doc.getId()); // Make sure to set the ID
+//                            sessions.add(session);
+//
+//                            Task<QuerySnapshot> t = db.collection("exams")
+//                                    .whereArrayContains("sessionId", session.getId())
+//                                    .get();
+//                            examTasks.add(t);
+//                        }
+//                    }
+//
+//                    if (examTasks.isEmpty()) {
+//                        callback.onResult(new ArrayList<>(), null);
+//                        return;
+//                    }
+//
+//                    Tasks.whenAllSuccess(examTasks)
+//                            .addOnSuccessListener(results -> {
+//                                List<Exam> allExams = new ArrayList<>();
+//                                for (Object o : results) {
+//                                    QuerySnapshot qs = (QuerySnapshot) o;
+//                                    for (DocumentSnapshot d : qs) {
+//                                        Exam exam = d.toObject(Exam.class);
+//                                        if (exam != null) {
+//                                            allExams.add(exam);
+//                                        }
+//                                    }
+//                                }
+//                                callback.onResult(allExams, null);
+//                            })
+//                            .addOnFailureListener(e -> callback.onResult(null, e));
+//                })
+//                .addOnFailureListener(e -> callback.onResult(null, e));
+//    }
+
     public void fetchExamQuestions(String examId, EventListener<QuerySnapshot> listener) {
         db.collection("exams").document(examId).collection("questions").addSnapshotListener(listener);
     }
 
     public void fetchExamDetails(String examId, EventListener<DocumentSnapshot> listener) {
         db.collection("exams").document(examId).addSnapshotListener(listener);
+    }
+
+    public void fetchExamDocumentByAssessmentId(String assessmentId, EventListener<QuerySnapshot> listener) {
+        db.collection("exams").whereEqualTo("assessment_id", assessmentId).addSnapshotListener(listener);
     }
 
     public interface QuestionCountCallback {

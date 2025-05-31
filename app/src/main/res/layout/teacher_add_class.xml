@@ -155,7 +155,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textView13" />
 
         <EditText
-            android:id="@+id/classNameText"
+            android:id="@+id/ExamNameText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -181,7 +181,7 @@
             android:textSize="26sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/classNameText" />
+            app:layout_constraintTop_toBottomOf="@+id/ExamNameText" />
 
         <TextView
             android:id="@+id/emptyStateTextView"
@@ -222,14 +222,14 @@
             app:layout_constraintVertical_bias="0.0">
 
             <LinearLayout
-                android:id="@+id/exam_list"
+                android:id="@+id/list_exam_dialog"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"/>
         </ScrollView>
 
         <ImageButton
-            android:id="@+id/add_btnStudent"
+            android:id="@+id/add_btn_student_session"
             android:layout_width="55dp"
             android:layout_height="55dp"
             android:layout_marginEnd="20sp"

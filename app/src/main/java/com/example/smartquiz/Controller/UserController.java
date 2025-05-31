@@ -83,6 +83,18 @@ public class UserController extends BaseController {
             }
         }
     }
+    public void getUserIdDocument(String userId,EventListener<DocumentSnapshot> listener) {
+        if (userId != null) {
+            db.collection("users").document(userId)
+                    .addSnapshotListener(listener);
+        } else {
+            if (listener != null) {
+                // Provide a proper FirebaseFirestoreException
+                listener.onEvent(null, new FirebaseFirestoreException("User not logged in or UID not available.",
+                        FirebaseFirestoreException.Code.UNAUTHENTICATED));
+            }
+        }
+    }
 
     public void updateUserDocument(User userUpdateData, OnCompleteListener<Void> listener) {
         String userId = getCurrentUserId();

@@ -6,19 +6,24 @@ public class Assessment {
     private String id;
     private String title;
     private String createdBy;
-    private String classId;
+    private List<String> classId;
     private List<StudentInfo> student;
+
+    public Assessment(String id, String title, String createdBy, List<String> classId,
+            List<Assessment.StudentInfo> student) {
+        this.id = id;
+        this.title = title;
+        this.createdBy = createdBy;
+        this.classId = classId;
+        this.student = student;
+    }
+
 
     public Assessment() {
         // Required for Firestore
     }
 
-    public Assessment(String id, String title, String createdBy, String classId) {
-        this.id = id;
-        this.title = title;
-        this.createdBy = createdBy;
-        this.classId = classId;
-    }
+
     public String getId() {
         return id;
     }
@@ -37,19 +42,21 @@ public class Assessment {
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
-    public String getClassId() {
-        return classId;
-    }
-    public void setClassId(String classId) {
-        this.classId = classId;
-    }
-
+    
     public List<StudentInfo> getStudent() {
         return student;
     }
 
     public void setStudent(List<StudentInfo> student) {
         this.student = student;
+    }
+
+    public List<String> getClassId() {
+        return classId;
+    }
+
+    public void setClassId(List<String> classId) {
+        this.classId = classId;
     }
 
     public static class StudentInfo {

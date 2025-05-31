@@ -2,7 +2,10 @@ package com.example.smartquiz.Controller;
 
 import com.example.smartquiz.Model.Class;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -22,6 +25,7 @@ public class ClassesController extends BaseController{
     }
 
     public void updateClass(Class updatedClass, OnCompleteListener<Void> listener) {
+        updatedClass.setCreatedBy(getCurrentUserId());
         db.collection("classes").document(updatedClass.getId()).set(updatedClass).addOnCompleteListener(listener);
     }
 
@@ -29,6 +33,15 @@ public class ClassesController extends BaseController{
         String userId = getCurrentUserId();
         Query query = db.collection("classes").whereEqualTo("createdBy", userId);
         query.get().addOnCompleteListener(listener);
+    }
+
+    public void getClassByCreatedByEventLis(EventListener<QuerySnapshot> listener) {
+        String userId = getCurrentUserId();
+        db.collection("classes").whereEqualTo("createdBy", userId).addSnapshotListener(listener);
+    }
+
+    public void getClassDocumentById(String classId, OnCompleteListener<DocumentSnapshot> listener) {
+        db.collection("classes").document(classId).get().addOnCompleteListener(listener);
     }
 
     public void updateClassStudents(Class updatedClass, OnCompleteListener<Void> listener) {

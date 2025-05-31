@@ -105,8 +105,8 @@
 
     <ScrollView
         android:id="@+id/scroll_list"
-        android:layout_width="398dp"
-        android:layout_height="644dp"
+        android:layout_width="396dp"
+        android:layout_height="619dp"
         android:layout_margin="8dp"
         app:layout_constraintBottom_toTopOf="@+id/down_arrow"
         app:layout_constraintEnd_toEndOf="parent"

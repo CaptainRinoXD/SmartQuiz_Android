@@ -29,6 +29,10 @@ public class TeacherAddExamManualActivity extends AppCompatActivity {
     private LinearLayout questionContainer;
     private Button addQuestionBtn, uploadExamBtn;
     private ExamController examController = new ExamController();
+    private String Assessment_id;
+    private String Assessment_title;
+    private int Duration;
+    private List<String> sessionIds;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,9 +43,15 @@ public class TeacherAddExamManualActivity extends AppCompatActivity {
             actionBar.hide();
         }
 
+        Assessment_id = getIntent().getStringExtra("ASSESSMENT_ID");
+        Assessment_title = getIntent().getStringExtra("ASSESSMENT_TITLE");
+        Duration = getIntent().getIntExtra("DURATION", 0);
+        sessionIds = getIntent().getStringArrayListExtra("SESSION_LIST");
+
+
         questionContainer = findViewById(R.id.question_container);
         addQuestionBtn = findViewById(R.id.btn_add_question);
-        uploadExamBtn = findViewById(R.id.btn_upload_exam);
+        uploadExamBtn = findViewById(R.id.btn_submit_exam);
 
         addQuestionBtn.setOnClickListener(v -> addQuestionItem());
         uploadExamBtn.setOnClickListener(v -> uploadExam());
@@ -111,7 +121,10 @@ public class TeacherAddExamManualActivity extends AppCompatActivity {
 
         // Tạo đối tượng Exam (có thể nhập thêm tiêu đề, thời gian hoặc gán mặc định)
         Exam exam = new Exam();
-        exam.setTitle("Đề mới tạo thủ công");
+        exam.setTitle(Assessment_title);
+        exam.setDuration(Duration);
+        exam.setAssessment_id(Assessment_id);
+        exam.setSessionId(sessionIds);
 
         examController.createExam(exam, questions, new OnCompleteListener<Void>() {
             @Override
