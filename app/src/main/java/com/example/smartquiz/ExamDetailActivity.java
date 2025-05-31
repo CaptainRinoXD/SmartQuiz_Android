@@ -20,6 +20,7 @@ import com.example.smartquiz.Model.Exam;
 public class ExamDetailActivity extends AppCompatActivity {
     private String examId;
     private TextView examTitle;
+    private String assessmentId;
     private TextView examDuration;
     private TextView examNumberOfQuestion;
     private ImageButton enter;
@@ -48,16 +49,19 @@ public class ExamDetailActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
+
         //String examId = intent.getStringExtra("EXAM_ID");
 
         if (extras != null) {
             examId = extras.getString("EXAM_ID");
+            assessmentId = extras.getString("ASSESSMENT_ID");
         }
         loadExamDetails();
 
         enter.setOnClickListener(v-> {
             Intent newIntent = new Intent(ExamDetailActivity.this, takeTestActivity.class);
             newIntent.putExtra("examId",examId);
+            newIntent.putExtra("ASSESSMENT_ID",assessmentId);
             startActivity(newIntent);
             
         });

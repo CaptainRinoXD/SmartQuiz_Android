@@ -1,6 +1,8 @@
 package com.example.smartquiz;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -13,18 +15,30 @@ import androidx.core.view.WindowInsetsCompat;
 import android.util.Log;
 
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.smartquiz.Controller.AssessmentController;
+import com.example.smartquiz.Controller.ClassesController;
 import com.example.smartquiz.Controller.ExamController;
+import com.example.smartquiz.Controller.SubmissionController;
+import com.example.smartquiz.Model.Assessment;
+import com.example.smartquiz.Model.Class;
 import com.example.smartquiz.Model.AssessmentSession;
 import com.example.smartquiz.Model.Exam;
+import com.example.smartquiz.Model.Submission;
+import com.example.smartquiz.TeacherActiviy.TeacherAddAssessmentActivity;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.Timestamp;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class ListTestActivity extends AppCompatActivity {
@@ -54,6 +68,7 @@ public class ListTestActivity extends AppCompatActivity {
 
         //loadExams();
         //loadExamsWithAssessment();
+        loadExamsWithAssessmentUpdate();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -63,83 +78,239 @@ public class ListTestActivity extends AppCompatActivity {
         Header_Controller.setup(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
     private void loadExamsWithAssessmentUpdate() {
-        List<String> validSessionIds = new ArrayList<>();
         examController.fetchSessionsForCurrentStudent((sessions, error) -> {
             if (error != null) {
                 Log.e(TAG, "Error fetching sessions", error);
                 return;
             }
+
+
+            Log.d(TAG, "Fetched " + sessions.size() + " sessions.");
             if (sessions != null) {
                 for (AssessmentSession session : sessions) {
-                    Date sessionDate = session.getTime();
-
+                    LinearLayout examContainer = new LinearLayout(ListTestActivity.this);
+                    examContainer.setOrientation(LinearLayout.VERTICAL);
+                    LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
+                    containerParams.setMargins(16, 32, 16, 8);
+                    examContainer.setLayoutParams(containerParams);
                     //so sánh thời gian
+                    Date sessionDate = session.getTime();
                     Date now = new Date();
                     if(now.after(sessionDate)){
                         long diffInMillis = now.getTime() - sessionDate.getTime();
                         long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMillis);
-                        if (diffInMinutes <= 30) {
+                        Log.d("SessionCheck", "Thời gian cách biệt: "+ diffInMinutes +" phút");
+                        if (diffInMinutes <= 60) {
+                            // Đang trong giờ thi
                             Log.d("SessionCheck", "OK: Đã quá giờ nhưng vẫn trong giới hạn 30 phút.");
-                            validSessionIds.add(session.getId());
+
+                            //Kiểm tra trước khi hiển thị xem học sinh đã làm bài này chưa
+                            checkIfStudentHasDoneAssessment(session, hasDone -> {
+                                if (hasDone) {
+                                    Log.d(TAG, "Student has already done this assessment");
+                                    return;
+                                } else {
+                                    ExamController examController = new ExamController();
+                                    examController.fetchExamsBySessionId(session.getId(), (exams, errorSEC)->{
+                                        if(errorSEC !=null) {Log.d(TAG,"errorSEC:"+ errorSEC);return;}
+                                        if(exams!=null) {
+                                            // Lấy ngẫu nhiên một đề thi từ danh sách
+                                            List<Exam> examList = new ArrayList<>(exams);
+                                            Exam randomExam;
+                                            if (!examList.isEmpty()) {
+                                                Random random = new Random();
+                                                int randomIndex = random.nextInt(examList.size());
+                                                randomExam = examList.get(randomIndex);
+
+                                                Log.d("RandomExam", "Mã đề thi ngẫu nhiên: " + randomExam.getTitle());
+                                            } else {
+                                                randomExam = null;
+                                            }
+
+                                            AssessmentController assessmentController = new AssessmentController();
+                                            assessmentController.getAssessmentById(session.getAssessmentId(), (task)->{
+                                                if (task.isSuccessful()) {
+                                                    Assessment assessment = task.getResult().toObject(Assessment.class);
+                                                    ClassesController classesController = new ClassesController();
+                                                    classesController.getClassDocumentById(assessment.getClassId().get(0), (task1)->{
+                                                        if (task1.isSuccessful()) {
+                                                            Class classes = task1.getResult().toObject(Class.class);
+
+                                                            // Create ClassTextView
+                                                            TextView ClassTextView = new TextView(this);
+                                                            ClassTextView.setText("Lớp học: "+classes.getName());
+                                                            ClassTextView.setBackgroundResource(R.drawable.blue_box);
+                                                            int paddingPx = dpToPx(16);
+                                                            ClassTextView.setPadding(paddingPx,dpToPx(5),paddingPx,dpToPx(5));
+                                                            ClassTextView.setTextSize(20);
+                                                            ClassTextView.setTypeface(null, Typeface.ITALIC);
+                                                            ClassTextView.setTextColor(Color.BLACK);
+                                                            ClassTextView.setElevation(dpToPx(6));
+                                                            ClassTextView.setTranslationZ(dpToPx(6));
+
+                                                            // Create ExamTextView
+                                                            TextView ExamTextView = new TextView(this);
+                                                            ExamTextView.setText("Kì thi đang diễn diễn ra: "+ assessment.getTitle() + ". Bấm vào để bắt đầu bài thi.");
+                                                            ExamTextView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+
+                                                            // Set container background
+                                                            examContainer.setBackgroundResource(R.drawable.white_box);
+
+                                                            // Add views in the correct order
+                                                            examContainer.addView(ClassTextView);  // First
+                                                            examContainer.addView(ExamTextView); // Second
+
+                                                            topicListLayout.addView(examContainer);
+
+
+                                                            examContainer.setOnClickListener(v -> {
+                                                                Log.d(TAG, "Clicked on exam: " + randomExam.getId() + ", Title: " + randomExam.getTitle());
+                                                                // TODO: Navigate to exam details activity or start the quiz
+                                                                Intent intent = new Intent(ListTestActivity.this, ExamDetailActivity.class);
+                                                                intent.putExtra("EXAM_ID", randomExam.getId());
+                                                                intent.putExtra("ASSESSMENT_ID", randomExam.getAssessment_id());
+                                                                startActivity(intent);
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+
                         } else {
+                            // Quá giờ thi
                             Log.d("SessionCheck", "Quá hạn 30 phút.");
                         }
                     } else {
-                        // Chưa tới giờ session
+                        // Chưa tới giờ thi
                         Log.d("SessionCheck", "Chưa tới giờ.");
+
+                        AssessmentController assessmentController = new AssessmentController();
+                        assessmentController.getAssessmentById(session.getAssessmentId(), (task)->{
+                            Log.d(TAG,"fetch: "+ task.getResult());
+                            if (task.isSuccessful()) {
+                                Assessment assessment = task.getResult().toObject(Assessment.class);
+                                ClassesController classesController = new ClassesController();
+                                classesController.getClassDocumentById(assessment.getClassId().get(0), (task1)->{
+                                    if (task1.isSuccessful()) {
+                                        Class classes = task1.getResult().toObject(Class.class);
+
+                                        // Create ClassTextView
+                                        TextView ClassTextView = new TextView(this);
+                                        ClassTextView.setText("Lớp học: "+classes.getName());
+                                        ClassTextView.setBackgroundResource(R.drawable.blue_box);
+                                        int paddingPx = dpToPx(16);
+                                        ClassTextView.setPadding(paddingPx,dpToPx(5),paddingPx,dpToPx(5));
+                                        ClassTextView.setTextSize(20);
+                                        ClassTextView.setTypeface(null, Typeface.ITALIC);
+                                        ClassTextView.setTextColor(Color.BLACK);
+                                        ClassTextView.setElevation(dpToPx(6));
+                                        ClassTextView.setTranslationZ(dpToPx(6));
+
+                                        // Create SessionTextView
+                                        SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM, yyyy, HH:mm", new Locale("vi", "VN"));
+                                        String formattedDate = formatter.format(session.getTime());
+                                        TextView SessionTextView = new TextView(this);
+                                        SessionTextView.setText("Kì thi sắp diễn ra: "+ assessment.getTitle()+" vào lúc " + formattedDate);
+                                        SessionTextView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+
+                                        // Set container background
+                                        examContainer.setBackgroundResource(R.drawable.white_box);
+
+                                        // Add views in the correct order
+                                        examContainer.addView(ClassTextView);  // First
+                                        examContainer.addView(SessionTextView); // Second
+                                        topicListLayout.addView(examContainer);
+                                    }
+                                });
+                            }
+                        });
                     }
                 }
+
             }
         });
     }
 
-//    private void loadExamsWithAssessment() {
-//        examController.fetchExamsForCurrentStudent((exams,error) -> {
-//            if(error !=null) {
-//                Log.e(TAG, "Error fetching exams", error);
-//                return;
-//            }
-//
-//            if(exams!=null) {
-//                topicListLayout.removeAllViews();
-//                for (Exam exam : exams) {
-//                    String examTitle;
-//                    if (exam != null && exam.getTitle() != null && !exam.getTitle().isEmpty()) {
-//                        examTitle = exam.getTitle();
-//                    } else {
-//                        examTitle = "Unknown Exa title";
-//                    }
-//
-//                    TextView examTextView = new TextView(this);
-//                    examTextView.setText(examTitle);
-//
-//                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-//                            LinearLayout.LayoutParams.MATCH_PARENT,
-//                            LinearLayout.LayoutParams.WRAP_CONTENT);
-//
-//                    int marginVerticalPx = dpToPx(4);
-//                    params.setMargins(0, marginVerticalPx, 0, marginVerticalPx);
-//                    examTextView.setLayoutParams(params);
-//
-//                    examTextView.setBackgroundResource(R.drawable.white_box);
-//
-//                    int paddingPx = dpToPx(16);
-//                    examTextView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
-//                    topicListLayout.addView(examTextView);
-//
-//                    examTextView.setOnClickListener(v -> {
-//                        Log.d(TAG, "Clicked on exam: " + exam.getId() + ", Title: " + examTitle);
-//                        // TODO: Navigate to exam details activity or start the quiz
-//                        Intent intent = new Intent(ListTestActivity.this, ExamDetailActivity.class);
-//                        intent.putExtra("EXAM_ID", exam.getId());
-//                        intent.putExtra("ASSESSMENT_ID", exam.getAssessment_id());
-//                        startActivity(intent);
-//                    });
-//                }
-//            }
-//        });
-//    }
+    public interface AssessmentCheckCallback {
+        void onResult(boolean hasDone);
+    }
+
+    private void checkIfStudentHasDoneAssessment(AssessmentSession session, AssessmentCheckCallback callback) {
+        SubmissionController submissionController = new SubmissionController();
+        submissionController.getAllSubmissionsFromStudent(submissions -> {
+            if(submissions == null){
+                Log.d(TAG, "Error fetching submissions" + session.getAssessmentId());
+                return;
+            }
+            for (Submission submission : submissions) {
+                if (submission.getAssessmentId().equals(session.getAssessmentId())) {
+                    callback.onResult(true);
+                    return;
+                }
+            }
+            callback.onResult(false);
+        });
+    }
+
+    private void loadExamsWithAssessment() {
+        examController.fetchExamsForCurrentStudent((exams,error) -> {
+            if(error !=null) {
+                Log.e(TAG, "Error fetching exams", error);
+                return;
+            }
+
+            if(exams!=null) {
+                topicListLayout.removeAllViews();
+                for (Exam exam : exams) {
+                    String examTitle;
+                    if (exam != null && exam.getTitle() != null && !exam.getTitle().isEmpty()) {
+                        examTitle = exam.getTitle();
+                    } else {
+                        examTitle = "Unknown Exa title";
+                    }
+
+                    TextView examTextView = new TextView(this);
+                    examTextView.setText(examTitle);
+
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                    int marginVerticalPx = dpToPx(4);
+                    params.setMargins(0, marginVerticalPx, 0, marginVerticalPx);
+                    examTextView.setLayoutParams(params);
+
+                    examTextView.setBackgroundResource(R.drawable.white_box);
+
+                    int paddingPx = dpToPx(16);
+                    examTextView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+                    topicListLayout.addView(examTextView);
+
+                    examTextView.setOnClickListener(v -> {
+                        Log.d(TAG, "Clicked on exam: " + exam.getId() + ", Title: " + examTitle);
+                        // TODO: Navigate to exam details activity or start the quiz
+                        Intent intent = new Intent(ListTestActivity.this, ExamDetailActivity.class);
+                        intent.putExtra("EXAM_ID", exam.getId());
+                        intent.putExtra("ASSESSMENT_ID", exam.getAssessment_id());
+                        startActivity(intent);
+                    });
+                }
+            }
+        });
+    }
 
     private void loadExams() {
         examController.fetchAllExams((value, error) -> {

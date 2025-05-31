@@ -31,6 +31,7 @@ public class AssessmentController extends BaseController{
                            OnSuccessListener<DocumentReference> listener, OnFailureListener failureListener) {
         String sessionId = db.collection("Assessment").document(assessmentId).collection("session").document().getId();
         session.setId(sessionId);
+        session.setAssessmentId(assessmentId);
         DocumentReference sessionRef = db.collection("Assessment")
                 .document(assessmentId)
                 .collection("session")
@@ -55,6 +56,21 @@ public class AssessmentController extends BaseController{
         db.collection("Assessment")
                 .whereArrayContains("classId", classId)
                 .addSnapshotListener(listener);
+    }
+    public void getAssessmentById(String assessmentId, OnCompleteListener<DocumentSnapshot> listener) {
+        if (assessmentId == null || assessmentId.trim().isEmpty()) {
+            Log.d("AssessmentController", "Invalid assessmentId: " + assessmentId);
+            return;
+        }
+
+        db.collection("Assessment") // Note: using plural form
+                .document(assessmentId)
+                .get()
+                .addOnCompleteListener(listener)
+                .addOnFailureListener(e -> {
+                    // Log error or handle failure
+                    Log.e("FirestoreError", "Failed to get assessment: " + e.getMessage());
+                });
     }
 
     // Lấy tất cả session theo assessment
@@ -238,7 +254,7 @@ public class AssessmentController extends BaseController{
                 .document(assessmentId)
                 .collection("session")
                 .document(sessionId);
-
+        updatedSession.setAssessmentId(assessmentId);
         // Use set() to replace the existing document with the updated data
         sessionRef.set(updatedSession)
                 .addOnCompleteListener(listener);

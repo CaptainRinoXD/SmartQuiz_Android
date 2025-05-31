@@ -9,6 +9,16 @@ public class AssessmentSession {
     private List<String> studentsInSession;
     private String id;
 
+    public String getAssessmentId() {
+        return assessmentId;
+    }
+
+    public void setAssessmentId(String assessmentId) {
+        this.assessmentId = assessmentId;
+    }
+
+    private String assessmentId;
+
 
     public String getId() {
         return id;

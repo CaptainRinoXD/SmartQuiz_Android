@@ -123,37 +123,27 @@ public class ExamController extends BaseController {
         void onResult(List<Exam> exams, Exception error);
     }
 
-    public void fetchExamsBySessionIds(List<String> sessionIds, ExamResultCallback callback) {
-        if (sessionIds == null || sessionIds.isEmpty()) {
+    public void fetchExamsBySessionId(String sessionId, ExamResultCallback callback) {
+        if (sessionId == null || sessionId.isEmpty()) {
             callback.onResult(new ArrayList<>(), null);
             return;
         }
 
-        List<Task<QuerySnapshot>> examTasks = new ArrayList<>();
+        db.collection("exams")
+                .whereArrayContains("sessionId", sessionId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<Exam> exams = new ArrayList<>();
 
-        for (String sessionId : sessionIds) {
-            Task<QuerySnapshot> task = db.collection("exams")
-                    .whereArrayContains("sessionId", sessionId)
-                    .get();
-            examTasks.add(task);
-        }
-
-        Tasks.whenAllSuccess(examTasks)
-                .addOnSuccessListener(results -> {
-                    List<Exam> allExams = new ArrayList<>();
-
-                    for (Object o : results) {
-                        QuerySnapshot qs = (QuerySnapshot) o;
-                        for (DocumentSnapshot d : qs) {
-                            Exam exam = d.toObject(Exam.class);
-                            if (exam != null) {
-                                exam.setId(d.getId()); // Set document ID if needed
-                                allExams.add(exam);
-                            }
+                    for (DocumentSnapshot d : querySnapshot) {
+                        Exam exam = d.toObject(Exam.class);
+                        if (exam != null) {
+                            exam.setId(d.getId()); // Set document ID if needed
+                            exams.add(exam);
                         }
                     }
 
-                    callback.onResult(allExams, null);
+                    callback.onResult(exams, null);
                 })
                 .addOnFailureListener(e -> callback.onResult(null, e));
     }
@@ -163,53 +153,53 @@ public class ExamController extends BaseController {
 //        void onResult(List<Exam> exams, Exception error);
 //    }
 //
-//    public void fetchExamsForCurrentStudent(ExamResultCallback callback) {
-//        String userId = getCurrentUserId();
-//
-//        // Query all subcollections named "session"
-//        db.collectionGroup("session")
-//                .whereArrayContains("studentsInSession", userId)
-//                .get()
-//                .addOnSuccessListener(sessionSnap -> {
-//                    List<AssessmentSession> sessions = new ArrayList<>();
-//                    List<Task<QuerySnapshot>> examTasks = new ArrayList<>();
-//
-//                    for (DocumentSnapshot doc : sessionSnap.getDocuments()) {
-//                        AssessmentSession session = doc.toObject(AssessmentSession.class);
-//                        if (session != null) {
-//                            session.setId(doc.getId()); // Make sure to set the ID
-//                            sessions.add(session);
-//
-//                            Task<QuerySnapshot> t = db.collection("exams")
-//                                    .whereArrayContains("sessionId", session.getId())
-//                                    .get();
-//                            examTasks.add(t);
-//                        }
-//                    }
-//
-//                    if (examTasks.isEmpty()) {
-//                        callback.onResult(new ArrayList<>(), null);
-//                        return;
-//                    }
-//
-//                    Tasks.whenAllSuccess(examTasks)
-//                            .addOnSuccessListener(results -> {
-//                                List<Exam> allExams = new ArrayList<>();
-//                                for (Object o : results) {
-//                                    QuerySnapshot qs = (QuerySnapshot) o;
-//                                    for (DocumentSnapshot d : qs) {
-//                                        Exam exam = d.toObject(Exam.class);
-//                                        if (exam != null) {
-//                                            allExams.add(exam);
-//                                        }
-//                                    }
-//                                }
-//                                callback.onResult(allExams, null);
-//                            })
-//                            .addOnFailureListener(e -> callback.onResult(null, e));
-//                })
-//                .addOnFailureListener(e -> callback.onResult(null, e));
-//    }
+    public void fetchExamsForCurrentStudent(ExamResultCallback callback) {
+        String userId = getCurrentUserId();
+
+        // Query all subcollections named "session"
+        db.collectionGroup("session")
+                .whereArrayContains("studentsInSession", userId)
+                .get()
+                .addOnSuccessListener(sessionSnap -> {
+                    List<AssessmentSession> sessions = new ArrayList<>();
+                    List<Task<QuerySnapshot>> examTasks = new ArrayList<>();
+
+                    for (DocumentSnapshot doc : sessionSnap.getDocuments()) {
+                        AssessmentSession session = doc.toObject(AssessmentSession.class);
+                        if (session != null) {
+                            session.setId(doc.getId()); // Make sure to set the ID
+                            sessions.add(session);
+
+                            Task<QuerySnapshot> t = db.collection("exams")
+                                    .whereArrayContains("sessionId", session.getId())
+                                    .get();
+                            examTasks.add(t);
+                        }
+                    }
+
+                    if (examTasks.isEmpty()) {
+                        callback.onResult(new ArrayList<>(), null);
+                        return;
+                    }
+
+                    Tasks.whenAllSuccess(examTasks)
+                            .addOnSuccessListener(results -> {
+                                List<Exam> allExams = new ArrayList<>();
+                                for (Object o : results) {
+                                    QuerySnapshot qs = (QuerySnapshot) o;
+                                    for (DocumentSnapshot d : qs) {
+                                        Exam exam = d.toObject(Exam.class);
+                                        if (exam != null) {
+                                            allExams.add(exam);
+                                        }
+                                    }
+                                }
+                                callback.onResult(allExams, null);
+                            })
+                            .addOnFailureListener(e -> callback.onResult(null, e));
+                })
+                .addOnFailureListener(e -> callback.onResult(null, e));
+    }
 
     public void fetchExamQuestions(String examId, EventListener<QuerySnapshot> listener) {
         db.collection("exams").document(examId).collection("questions").addSnapshotListener(listener);

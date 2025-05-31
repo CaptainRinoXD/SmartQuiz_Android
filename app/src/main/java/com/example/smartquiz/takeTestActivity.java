@@ -157,6 +157,7 @@ public class takeTestActivity extends AppCompatActivity {
         submission.setExamId(examId);
         submission.setAssessmentId(assessmentId);
         List<SubmissionAnswer> answers = new ArrayList<>();
+        boolean allAnsweredInside = false;
         
 
         for (int i = 0; i < questionsLinearLayout.getChildCount(); i++) {
@@ -169,9 +170,10 @@ public class takeTestActivity extends AppCompatActivity {
                 int selectedRadioButtonId = radioGroup.getCheckedRadioButtonId();
                 if(selectedRadioButtonId == -1) {
                     showLoading(false);
+                    allAnsweredInside = false;
                 }
                 if (selectedRadioButtonId != -1) {
-                    AllAnswered = true;
+                    allAnsweredInside = true;
                     RadioButton selectedRadioButton = findViewById(selectedRadioButtonId);
                     SubmissionAnswer submissionAnswer = new SubmissionAnswer();
                     submissionAnswer.setQuestionId(questionId); //setting the same id for subAnswers
@@ -201,7 +203,7 @@ public class takeTestActivity extends AppCompatActivity {
                     return;
                 }
             }
-        }
+        } AllAnswered = allAnsweredInside;
         submission.setAnswers(answers);
         String durationString = textViewDuration.getText().toString();
         if (!durationString.equals("Finish")) {
