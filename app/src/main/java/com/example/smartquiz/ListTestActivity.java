@@ -94,52 +94,52 @@ public class ListTestActivity extends AppCompatActivity {
         });
     }
 
-    private void loadExamsWithAssessment() {
-        examController.fetchExamsForCurrentStudent((exams,error) -> {
-            if(error !=null) {
-                Log.e(TAG, "Error fetching exams", error);
-                return;
-            }
-
-            if(exams!=null) {
-                topicListLayout.removeAllViews();
-                for (Exam exam : exams) {
-                    String examTitle;
-                    if (exam != null && exam.getTitle() != null && !exam.getTitle().isEmpty()) {
-                        examTitle = exam.getTitle();
-                    } else {
-                        examTitle = "Unknown Exa title";
-                    }
-
-                    TextView examTextView = new TextView(this);
-                    examTextView.setText(examTitle);
-
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT);
-
-                    int marginVerticalPx = dpToPx(4);
-                    params.setMargins(0, marginVerticalPx, 0, marginVerticalPx);
-                    examTextView.setLayoutParams(params);
-
-                    examTextView.setBackgroundResource(R.drawable.white_box);
-
-                    int paddingPx = dpToPx(16);
-                    examTextView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
-                    topicListLayout.addView(examTextView);
-
-                    examTextView.setOnClickListener(v -> {
-                        Log.d(TAG, "Clicked on exam: " + exam.getId() + ", Title: " + examTitle);
-                        // TODO: Navigate to exam details activity or start the quiz
-                        Intent intent = new Intent(ListTestActivity.this, ExamDetailActivity.class);
-                        intent.putExtra("EXAM_ID", exam.getId());
-                        intent.putExtra("ASSESSMENT_ID", exam.getAssessment_id());
-                        startActivity(intent);
-                    });
-                }
-            }
-        });
-    }
+//    private void loadExamsWithAssessment() {
+//        examController.fetchExamsForCurrentStudent((exams,error) -> {
+//            if(error !=null) {
+//                Log.e(TAG, "Error fetching exams", error);
+//                return;
+//            }
+//
+//            if(exams!=null) {
+//                topicListLayout.removeAllViews();
+//                for (Exam exam : exams) {
+//                    String examTitle;
+//                    if (exam != null && exam.getTitle() != null && !exam.getTitle().isEmpty()) {
+//                        examTitle = exam.getTitle();
+//                    } else {
+//                        examTitle = "Unknown Exa title";
+//                    }
+//
+//                    TextView examTextView = new TextView(this);
+//                    examTextView.setText(examTitle);
+//
+//                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+//                            LinearLayout.LayoutParams.MATCH_PARENT,
+//                            LinearLayout.LayoutParams.WRAP_CONTENT);
+//
+//                    int marginVerticalPx = dpToPx(4);
+//                    params.setMargins(0, marginVerticalPx, 0, marginVerticalPx);
+//                    examTextView.setLayoutParams(params);
+//
+//                    examTextView.setBackgroundResource(R.drawable.white_box);
+//
+//                    int paddingPx = dpToPx(16);
+//                    examTextView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+//                    topicListLayout.addView(examTextView);
+//
+//                    examTextView.setOnClickListener(v -> {
+//                        Log.d(TAG, "Clicked on exam: " + exam.getId() + ", Title: " + examTitle);
+//                        // TODO: Navigate to exam details activity or start the quiz
+//                        Intent intent = new Intent(ListTestActivity.this, ExamDetailActivity.class);
+//                        intent.putExtra("EXAM_ID", exam.getId());
+//                        intent.putExtra("ASSESSMENT_ID", exam.getAssessment_id());
+//                        startActivity(intent);
+//                    });
+//                }
+//            }
+//        });
+//    }
 
     private void loadExams() {
         examController.fetchAllExams((value, error) -> {

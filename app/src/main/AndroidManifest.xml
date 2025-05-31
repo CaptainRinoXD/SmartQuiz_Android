@@ -12,6 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartQuiz"
         tools:targetApi="31">
+
+
         <activity
             android:name=".TeacherActiviy.TeacherAddAssessmentActivity"
             android:exported="false" />
