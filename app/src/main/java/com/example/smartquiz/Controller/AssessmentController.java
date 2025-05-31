@@ -27,6 +27,18 @@ public class AssessmentController extends BaseController{
                 .addOnCompleteListener(listener);
     }
 
+    public void updateAssessment(
+            String assessmentId,
+            Assessment updatedAssessment,
+            OnCompleteListener<Void> listener) {
+
+        DocumentReference docRef = db.collection("Assessment")
+                .document(assessmentId);
+
+        docRef.set(updatedAssessment)
+                .addOnCompleteListener(listener);
+    }
+
     public void addSession(String assessmentId, AssessmentSession session,
                            OnSuccessListener<DocumentReference> listener, OnFailureListener failureListener) {
         String sessionId = db.collection("Assessment").document(assessmentId).collection("session").document().getId();
@@ -164,14 +176,12 @@ public class AssessmentController extends BaseController{
                     if (snapshot != null && snapshot.exists()) {
                         Assessment assess = snapshot.toObject(Assessment.class);
                         if (assess != null && assess.getStudent() != null) {
-                            Log.d("AssessmentController", "Found " + assess.getStudent().size()+ " students in assessment " + assessmentId + ", getALL=" + getALL);
                             for (Assessment.StudentInfo s : assess.getStudent()) {
-                                if (!s.isSelected() && !getALL) {
-                                    result.add(s);
-                                } else if (getALL) {
+                                if (!s.isSelected() ) {
                                     result.add(s);
                                 }
                             }
+                            Log.d("AssessmentController", "Found " + result.size()+ " students in assessment " + assessmentId + ", getALL=" + getALL);
                         }
                     }
 

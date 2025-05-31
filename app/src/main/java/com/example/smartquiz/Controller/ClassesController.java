@@ -44,6 +44,10 @@ public class ClassesController extends BaseController{
         db.collection("classes").document(classId).get().addOnCompleteListener(listener);
     }
 
+    public void getClassDocumentByIdEventLis(String classId, EventListener<DocumentSnapshot> listener) {
+        db.collection("classes").document(classId).addSnapshotListener(listener);
+    }
+
     public void updateClassStudents(Class updatedClass, OnCompleteListener<Void> listener) {
         db.collection("classes").document(updatedClass.getId())
                 .update("studentsId", updatedClass.getStudentsId())

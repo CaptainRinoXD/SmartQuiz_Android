@@ -238,7 +238,8 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
             AtomicReference<AssessmentSession> updateSession = new AtomicReference<>(new AssessmentSession());
 
             //Get all student in assessment
-            assessmentController.listenForUnselectedStudents(Assessment_id, true, (valueSec, errorSec) -> {
+            allStudent.clear();
+            assessmentController.listenForUnselectedStudents(Assessment_id, false, (valueSec, errorSec) -> {
                 for (Assessment.StudentInfo studentInfo : valueSec) {
                     allStudent.add(studentInfo.getUserId());
                 }
@@ -251,8 +252,8 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
 
                 updateSession.set(assessmentSession);
                 SessionNameText.setText(assessmentSession.getTitle());
+                allStudent.addAll(assessmentSession.getStudentsInSession());
                 StudentAlreadyInSession.addAll(assessmentSession.getStudentsInSession());
-
                 //logic for add date,show date
                 Date date = updateSession.get().getTime();
                 Calendar cal = Calendar.getInstance(
@@ -521,6 +522,7 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
                     Exam exam = document.toObject(Exam.class);
 
                     LinearLayout examContainer = new LinearLayout(TeacherAddAssessmentActivity.this);
+                    examContainer.removeAllViews();
                     examContainer.setOrientation(LinearLayout.VERTICAL);
                     LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,

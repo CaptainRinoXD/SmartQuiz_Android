@@ -100,6 +100,7 @@ public class TeacherListClassActivity extends AppCompatActivity {
         scroll_view_class_list.addView(classTextView);
         classTextView.setOnClickListener(v -> {
            Intent intent = new Intent(TeacherListClassActivity.this, TeacherListAssessmentActivity.class);
+           intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
            intent.putExtra("CLASS_ID", aClass.getId());
            startActivity(intent);
         });

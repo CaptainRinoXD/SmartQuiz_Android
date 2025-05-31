@@ -72,17 +72,6 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
        });
 
         AssessmentController assessmentController = new AssessmentController();
-//        assessmentController.getAssessmentsByClassId(classId, (querySnapshot) -> {
-//            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-//                Assessment currAssessment = document.toObject(Assessment.class);
-//                if (currAssessment != null) {
-//                    emptyStateTextView.setVisibility(View.GONE);
-//                    currAssessment.setId(document.getId());
-//                    assessmentsList.add(currAssessment);
-//                    displayAssessment(currAssessment);
-//                }
-//            }
-//        });
 
         assessmentController.getAssessmentsByClassIdEventLis(classId, (value,error) -> {
             if(value == null || error != null) {return;}
@@ -99,7 +88,7 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
         });
 
         add_btnAssessment.setOnClickListener(v -> {
-            dialog_add_assessment();
+            dialog_add_assessment(false,null);
         });
     }
 
@@ -125,6 +114,11 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
             intent.putExtra("ASSESSMENT_TITLE", assessment.getTitle());
             startActivity(intent);
         });
+
+        assessmentTextView.setOnLongClickListener(v -> {
+            dialog_add_assessment(true, assessment);
+            return true;
+        });
     }
 
     private int dpToPx(int dp) {
@@ -132,7 +126,7 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
         return Math.round((float) dp * density);
     }
 
-    private void dialog_add_assessment() {
+    private void dialog_add_assessment(boolean isUpdate, Assessment updateAssessment) {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(true); // Allow dismissing by tapping outside or back button
@@ -158,33 +152,56 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
             dialog.dismiss();
         });
 
-        fetchAndDisplayStudentClass(student_list,emptyStateTextViewDialog);
+        fetchAndDisplayStudentClass(student_list,emptyStateTextViewDialog,isUpdate,updateAssessment);
         dialog.show();
 
-        createAssessmentBtn.setOnClickListener(view-> {
-            getCheckBoxAssessment(student_list,studentInfoList);
-            String assessmentName = AssessmentNameText.getText().toString();
-            if (studentInfoList.isEmpty() || AssessmentNameText.getText().toString().isEmpty()) {
-                Toast.makeText(TeacherListAssessmentActivity.this, "Please complete the form!!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            Assessment newAssessment = new Assessment();
-            newAssessment.setTitle(assessmentName);
-            newAssessment.setClassId(Collections.singletonList(classId));
-            newAssessment.setStudent(studentInfoList);
-            newAssessment.setClassId(classIdArray);
-
-            AssessmentController assessmentController = new AssessmentController();
-            assessmentController.createAssessment(newAssessment, (task) -> {
-                if(task.isSuccessful()) {
-                    Toast.makeText(TeacherListAssessmentActivity.this, "Assessment created successfully", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-                } else {
-                    Toast.makeText(TeacherListAssessmentActivity.this, "Failed to create assessment", Toast.LENGTH_SHORT).show();
+        if(!isUpdate) {
+            createAssessmentBtn.setOnClickListener(view-> {
+                getCheckBoxAssessment(student_list,studentInfoList);
+                String assessmentName = AssessmentNameText.getText().toString();
+                if (studentInfoList.isEmpty() || AssessmentNameText.getText().toString().isEmpty()) {
+                    Toast.makeText(TeacherListAssessmentActivity.this, "Thiếu Thông tin!!!!", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+
+                Assessment newAssessment = new Assessment();
+                newAssessment.setTitle(assessmentName);
+                newAssessment.setClassId(Collections.singletonList(classId));
+                newAssessment.setStudent(studentInfoList);
+                newAssessment.setClassId(classIdArray);
+
+                AssessmentController assessmentController = new AssessmentController();
+                assessmentController.createAssessment(newAssessment, (task) -> {
+                    if(task.isSuccessful()) {
+                        Toast.makeText(TeacherListAssessmentActivity.this, "Assessment created successfully", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(TeacherListAssessmentActivity.this, "Failed to create assessment", Toast.LENGTH_SHORT).show();
+                    }
+                });
             });
-        });
+        } else {
+            createAssessmentBtn.setText("Cập nhật");
+            AssessmentNameText.setText(updateAssessment.getTitle());
+            createAssessmentBtn.setOnClickListener(view-> {
+                getCheckBoxAssessment(student_list,studentInfoList);
+                if (studentInfoList.isEmpty() || AssessmentNameText.getText().toString().isEmpty()) {
+                    Toast.makeText(TeacherListAssessmentActivity.this, "Thiếu Thông tin!!!!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                updateAssessment.setTitle(AssessmentNameText.getText().toString());
+                updateAssessment.setStudent(studentInfoList);
+                AssessmentController assessmentController = new AssessmentController();
+                assessmentController.updateAssessment(updateAssessment.getId(),updateAssessment, (task) -> {
+                    if(task.isSuccessful()) {
+                        Toast.makeText(TeacherListAssessmentActivity.this, "Assessment updated successfully", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(TeacherListAssessmentActivity.this, "Failed to update assessment", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
+        }
 
     }
 
@@ -205,7 +222,8 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
         }
     }
     
-    private void fetchAndDisplayStudentClass(LinearLayout student_list, TextView emptyStateTextViewDialog) {
+    private void fetchAndDisplayStudentClass(LinearLayout student_list, TextView emptyStateTextViewDialog,
+                                             boolean isUpdate, Assessment updateAssessment) {
         student_list.removeAllViews();
 
         ClassesController classesController = new ClassesController();
@@ -243,8 +261,18 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
 
                                 studentCheckbox.setText(student.getEmail());
                                 studentCheckbox.setTag(student.getUid());
-
-                                studentCheckbox.setChecked(true);
+                                if (isUpdate) {
+                                    for (Assessment.StudentInfo studentInfo : updateAssessment.getStudent()) {
+                                        if (studentInfo.getUserId().equals(student.getUid())) {
+                                            studentCheckbox.setChecked(true);
+                                            break;
+                                        } else {
+                                            studentCheckbox.setChecked(false);
+                                        }
+                                    }
+                                } else {
+                                    studentCheckbox.setChecked(true);
+                                }
 
                                 studentCheckbox.setTextSize(16);
                                 studentCheckbox.setTextColor(Color.BLACK);
