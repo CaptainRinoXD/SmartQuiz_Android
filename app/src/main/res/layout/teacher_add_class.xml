@@ -6,56 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/floating_menu"
-        android:layout_width="388dp"
-        android:layout_height="689dp"
-        android:layout_margin="16dp"
-        android:background="@drawable/white_box"
-        android:elevation="8dp"
-        android:maxWidth="385dp"
-        android:orientation="vertical"
-        android:padding="12dp"
-        android:visibility="gone"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
-
-        <TextView
-            android:id="@+id/menu_home"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Upload đề"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/classes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Lớp Học"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/menu_test"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Sửa đề"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/menu_answer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Tạo đề"
-            android:textSize="18sp" />
-    </LinearLayout>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
