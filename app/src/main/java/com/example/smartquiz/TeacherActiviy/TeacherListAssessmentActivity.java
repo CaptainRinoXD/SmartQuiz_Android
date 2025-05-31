@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.smartquiz.Controller.AssessmentController;
 import com.example.smartquiz.Controller.ClassesController;
 import com.example.smartquiz.Controller.UserController;
+import com.example.smartquiz.Header_Controller_Teacher;
 import com.example.smartquiz.Model.Assessment;
 import com.example.smartquiz.Model.Class;
 import com.example.smartquiz.Model.User;
@@ -54,7 +55,8 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
         emptyStateTextView = findViewById(R.id.emptyStateTextView);
         add_btnAssessment = findViewById(R.id.add_btnAssessment);
         assessmentsList = new ArrayList<>();
-        
+
+        Header_Controller_Teacher.setup(this);
        classId = getIntent().getStringExtra("CLASS_ID");
        ClassesController currClasses = new ClassesController();
        currClasses.getClassDocumentById(classId ,(task)-> {

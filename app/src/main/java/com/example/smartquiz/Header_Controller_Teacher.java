@@ -37,8 +37,8 @@ public class Header_Controller_Teacher {
         ImageView menuButton = activity.findViewById(R.id.registerBtn);
         TextView homeButton = activity.findViewById(R.id.menu_home);
         TextView classes = activity.findViewById(R.id.classes);
-        TextView uploadTest = activity.findViewById(R.id.menu_test);
-        TextView createTest = activity.findViewById(R.id.menu_answer);
+        //TextView uploadTest = activity.findViewById(R.id.menu_test);
+        //TextView createTest = activity.findViewById(R.id.menu_answer);
         TextView logoutButton = menuView.findViewById(R.id.menu_logout_teacher);
         TextView userName = activity.findViewById(R.id.user_name);
 
@@ -88,12 +88,12 @@ public class Header_Controller_Teacher {
             isMenuVisible = false;
         });
 
-        createTest.setOnClickListener(v -> {
-            Intent intent = new Intent(activity, TeacherAddExamManualActivity.class);
-            activity.startActivity(intent);
-            floatingMenu.setVisibility(View.GONE);
-            isMenuVisible = false;
-        });
+//        createTest.setOnClickListener(v -> {
+//            Intent intent = new Intent(activity, TeacherAddExamManualActivity.class);
+//            activity.startActivity(intent);
+//            floatingMenu.setVisibility(View.GONE);
+//            isMenuVisible = false;
+//        });
 
         logoutButton.setOnClickListener(v -> {
             userController.signOut();

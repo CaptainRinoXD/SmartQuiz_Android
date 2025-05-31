@@ -15,11 +15,14 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.smartquiz.Controller.ExamController;
+import com.example.smartquiz.Header_Controller_Teacher;
 import com.example.smartquiz.Model.Exam;
 import com.example.smartquiz.Model.Question;
 import com.example.smartquiz.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.api.Distribution;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +33,12 @@ public class TeacherAddExamManualActivity extends AppCompatActivity {
     private Button addQuestionBtn, uploadExamBtn;
     private ExamController examController = new ExamController();
     private String Assessment_id;
-    private String Assessment_title;
+    private String Exam_title;
+    private String examId;
+    private String created_by;
     private int Duration;
     private List<String> sessionIds;
+    private boolean isUpadate = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,11 +48,54 @@ public class TeacherAddExamManualActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
-
+        //Header_Controller_Teacher.setup(this);
         Assessment_id = getIntent().getStringExtra("ASSESSMENT_ID");
-        Assessment_title = getIntent().getStringExtra("ASSESSMENT_TITLE");
+        Exam_title = getIntent().getStringExtra("EXAM_TITLE");
         Duration = getIntent().getIntExtra("DURATION", 0);
         sessionIds = getIntent().getStringArrayListExtra("SESSION_LIST");
+        try {
+            examId = getIntent().getStringExtra("EXAM_ID");
+            created_by= getIntent().getStringExtra("CREATED_BY");
+            if (examId!= null) {isUpadate = true;}
+            ExamController examController = new ExamController();
+            examController.fetchExamQuestions(examId,(value, error)->{
+                if (value == null) {return;}
+                for (DocumentSnapshot doc : value) {
+                    Question question = doc.toObject(Question.class);
+                    List<String> answersList = question.getAnswers();
+                    int correctIndex = question.getCorrectAnswerIndex();
+
+
+                    addQuestionItem();
+                    View questionItem = questionContainer.getChildAt(questionContainer.getChildCount() - 1);
+
+                    EditText edtQuestion = questionItem.findViewById(R.id.edt_question_text);
+                    EditText edtAnswerA = questionItem.findViewById(R.id.edt_answer_0);
+                    EditText edtAnswerB = questionItem.findViewById(R.id.edt_answer_1);
+                    EditText edtAnswerC = questionItem.findViewById(R.id.edt_answer_2);
+                    EditText edtAnswerD = questionItem.findViewById(R.id.edt_answer_3);
+                    RadioGroup radioGroup = questionItem.findViewById(R.id.radio_group_answers);
+
+                    edtQuestion.setText(question.getQuestionText());
+                    edtAnswerA.setText(answersList.get(0));
+                    edtAnswerB.setText(answersList.get(1));
+                    edtAnswerC.setText(answersList.get(2));
+                    edtAnswerD.setText(answersList.get(3));
+
+                    if(correctIndex == 0) {
+                        radioGroup.check(R.id.radio_answer_0);
+                    } else if(correctIndex == 1) {
+                        radioGroup.check(R.id.radio_answer_1);
+                    } else if (correctIndex == 2) {
+                        radioGroup.check(R.id.radio_answer_2);
+                    } else if (correctIndex == 3) {
+                        radioGroup.check(R.id.radio_answer_3);
+                    }
+
+                }
+
+            });
+        } catch (Exception e) {}
 
 
         questionContainer = findViewById(R.id.question_container);
@@ -121,21 +170,35 @@ public class TeacherAddExamManualActivity extends AppCompatActivity {
 
         // Tạo đối tượng Exam (có thể nhập thêm tiêu đề, thời gian hoặc gán mặc định)
         Exam exam = new Exam();
-        exam.setTitle(Assessment_title);
+        exam.setCreatedBy(created_by);
+        exam.setTitle(Exam_title);
         exam.setDuration(Duration);
         exam.setAssessment_id(Assessment_id);
         exam.setSessionId(sessionIds);
 
-        examController.createExam(exam, questions, new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(TeacherAddExamManualActivity.this, "Tải đề thành công!", Toast.LENGTH_SHORT).show();
+        if (isUpadate) {
+            exam.setId(examId);
+            exam.setCreatedBy(created_by);
+            examController.updateExam(examId,exam, questions,(task)->{
+                if(task.isSuccessful()){
+                    Toast.makeText(TeacherAddExamManualActivity.this, "Cập nhật đề thành công!", Toast.LENGTH_SHORT).show();
                     finish();
                 } else {
-                    Toast.makeText(TeacherAddExamManualActivity.this, "Lỗi khi tải đề", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeacherAddExamManualActivity.this, "Lỗi khi cập nhật đề", Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
+            });
+        } else {
+            examController.createExam(exam, questions, new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(TeacherAddExamManualActivity.this, "Tải đề thành công!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(TeacherAddExamManualActivity.this, "Lỗi khi tải đề", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
     }
 }

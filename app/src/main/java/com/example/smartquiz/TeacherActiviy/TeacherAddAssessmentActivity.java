@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.smartquiz.Controller.AssessmentController;
 import com.example.smartquiz.Controller.ExamController;
 import com.example.smartquiz.Controller.UserController;
+import com.example.smartquiz.Header_Controller_Teacher;
 import com.example.smartquiz.Model.Assessment;
 import com.example.smartquiz.Model.AssessmentSession;
 import com.example.smartquiz.Model.Exam;
@@ -38,11 +39,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class TeacherAddAssessmentActivity extends AppCompatActivity {
@@ -62,6 +66,8 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
+        Header_Controller_Teacher.setup(this);
+
         Assessment_id = getIntent().getStringExtra("ASSESSMENT_ID");
         TextView assessment_name = findViewById(R.id.assessment_name);
         ImageButton add_exam = findViewById(R.id.add_btnExam);
@@ -82,7 +88,7 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
             AssessmentController assessmentController = new AssessmentController();
             assessmentController.getAllSessions(Assessment_id,(value,error)->{
                 if (value != null){
-                    dialog_add_exam();
+                    dialog_add_exam(false, null);
                 } else {
                     Toast.makeText(TeacherAddAssessmentActivity.this, "Hãy thêm ca thi để tạo đề.", Toast.LENGTH_SHORT).show();
 
@@ -416,7 +422,7 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
     }
 
 
-    private void dialog_add_exam() {
+    private void dialog_add_exam(boolean isUpdate, Exam updatedExam) {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(true);
@@ -431,16 +437,30 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
         Button cancelBtn = dialogView.findViewById(R.id.cancelBtn);
         List<String> session_arrayList = new ArrayList<>();
         LinearLayout session_list_exam_dialog = dialogView.findViewById(R.id.list_exam_dialog);
+        TextView statusTextView = dialogView.findViewById(R.id.textView13);
+        TextView emptyStateTextView = dialogView.findViewById(R.id.emptyStateTextView);
 
-
+        if(isUpdate){
+            ExamNameText.setText(updatedExam.getTitle());
+            durationText.setText(String.valueOf(updatedExam.getDuration()));
+            statusTextView.setText("Cập nhật đề");
+        }
 
         AssessmentController assessmentController = new AssessmentController();
         assessmentController.getAllSessions(Assessment_id,(value,error)->{
             if(value!=null) {
+                emptyStateTextView.setVisibility(View.GONE);
                 session_list_exam_dialog.removeAllViews();
                 for (DocumentSnapshot document : value.getDocuments()){
                     AssessmentSession assessmentSession = document.toObject(AssessmentSession.class);
                     CheckBox sessionCheckBox = new CheckBox(TeacherAddAssessmentActivity.this);
+                    if (isUpdate) {
+                        for ( String sessionId : updatedExam.getSessionId()) {
+                            if(Objects.equals(assessmentSession.getId(),sessionId)){
+                                sessionCheckBox.setChecked(true);
+                            }
+                        }
+                    }
                     sessionCheckBox.setTag(assessmentSession.getId());
                     sessionCheckBox.setText("Ca thi: "+assessmentSession.getTitle());
                     sessionCheckBox.setTextSize(16);
@@ -462,9 +482,18 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
             }
 
             getCheckBoxAssessment(session_list_exam_dialog,session_arrayList,null,false );
+            if (examName.isEmpty() || duration.isEmpty() || session_arrayList.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập đủ thông tin!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Intent intent = new Intent(TeacherAddAssessmentActivity.this, TeacherAddExamManualActivity.class);
+            if(isUpdate){
+                intent.putExtra("EXAM_ID",updatedExam.getId());
+                intent.putExtra("CREATED_BY", updatedExam.getCreatedBy());
+            }
             intent.putExtra("ASSESSMENT_ID", Assessment_id);
-            intent.putExtra("ASSESSMENT_TITLE", examName);
+            intent.putExtra("EXAM_TITLE", examName);
             intent.putExtra("DURATION", durationInt);
             intent.putStringArrayListExtra("SESSION_LIST", (ArrayList<String>) session_arrayList);
             startActivity(intent);
@@ -502,7 +531,7 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
                         session_name.setTextColor(Color.BLACK);
 
                         session_name.setOnClickListener(v -> {
-                            Toast.makeText(TeacherAddAssessmentActivity.this, "Đã chọn ca thi: " + assessmentSession.getTitle(), Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(TeacherAddAssessmentActivity.this, "Đã chọn ca thi: " + assessmentSession.getTitle(), Toast.LENGTH_SHORT).show();
                             dialog_add_session(true,assessmentSession.getId());
                         });
 
@@ -522,7 +551,6 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
                     Exam exam = document.toObject(Exam.class);
 
                     LinearLayout examContainer = new LinearLayout(TeacherAddAssessmentActivity.this);
-                    examContainer.removeAllViews();
                     examContainer.setOrientation(LinearLayout.VERTICAL);
                     LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -531,7 +559,6 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
                     examContainer.setLayoutParams(containerParams);
 
                     TextView exam_name = new TextView(TeacherAddAssessmentActivity.this);
-
                     exam_name.setText("Đề thi: "+ exam.getTitle() + " | Thời gian: " + exam.getDuration() + " phút");
                     exam_name.setBackgroundResource(R.drawable.light_blue);
                     int paddingPx = dpToPx(16);
@@ -544,30 +571,51 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
 
                     examContainer.addView(exam_name);
 
+                    // Create a container specifically for session views
+                    LinearLayout sessionContainer = new LinearLayout(TeacherAddAssessmentActivity.this);
+                    sessionContainer.setOrientation(LinearLayout.VERTICAL);
+                    examContainer.addView(sessionContainer);
 
+                    // Keep track of sessions and use a Set to prevent duplicates
+                    Set<String> addedSessions = new HashSet<>();
+                    final int totalSessions = exam.getSessionId().size();
+                    final AtomicInteger loadedSessions = new AtomicInteger(0);
 
                     for (String sessionId : exam.getSessionId()) {
                         AssessmentController assessmentController1 = new AssessmentController();
                         assessmentController1.getSessionsById(Assessment_id, sessionId, (value1, error1) -> {
                             if(value1 != null) {
-                                TextView session_name = new TextView(TeacherAddAssessmentActivity.this);
-                                Log.d(TAG, "fetchExamDocumentByAssessmentId: " + value.size());
                                 AssessmentSession assessmentSession = value1.toObject(AssessmentSession.class);
                                 assert assessmentSession != null;
                                 String sessionName = assessmentSession.getTitle();
-                                session_name.setText("Ca thi: " + sessionName);
-                                session_name.setPadding(paddingPx, dpToPx(5), paddingPx, dpToPx(5));
-                                session_name.setTextSize(16);
-                                session_name.setTextColor(Color.DKGRAY);
 
-                                examContainer.addView(session_name);
+                                // Prevent duplicate sessions
+                                if (!addedSessions.contains(sessionId)) {
+                                    addedSessions.add(sessionId);
+
+                                    TextView session_name = new TextView(TeacherAddAssessmentActivity.this);
+                                    Log.d(TAG, "fetchExamDocumentByAssessmentId: " + value.size());
+                                    session_name.setText("Ca thi: " + sessionName);
+                                    session_name.setPadding(paddingPx, dpToPx(5), paddingPx, dpToPx(5));
+                                    session_name.setTextSize(16);
+                                    session_name.setTextColor(Color.DKGRAY);
+
+                                    sessionContainer.addView(session_name);
+                                }
+
+                                // Check if this is the last session to load
+                                if (loadedSessions.incrementAndGet() == totalSessions) {
+                                    examContainer.setBackgroundResource(R.drawable.blue_box);
+                                }
+
+                                examContainer.setOnClickListener(v -> {
+                                    dialog_add_exam(true, exam);
+                                });
                             }
                         });
                     }
 
-                    examContainer.setBackgroundResource(R.drawable.blue_box);
                     list_exam_ln.addView(examContainer);
-
                 }
             }
         });

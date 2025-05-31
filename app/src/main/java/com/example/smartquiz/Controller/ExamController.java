@@ -19,7 +19,11 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 public class ExamController extends BaseController {
@@ -244,5 +248,88 @@ public class ExamController extends BaseController {
                     }
                 }
             });
+    }
+
+    public void updateExam(
+            String examId,
+            Exam updatedExam,
+            List<Question> updatedQuestions,
+            OnCompleteListener<Void> listener) {
+
+        String userId = getCurrentUserId();
+        if (userId == null) {
+            listener.onComplete(Tasks.forException(new Exception("User not authenticated")));
+            return;
+        }
+
+        DocumentReference examRef = db.collection("exams").document(examId);
+
+        examRef.get().addOnSuccessListener(examSnapshot -> {
+            if (!examSnapshot.exists()) {
+                listener.onComplete(Tasks.forException(new Exception("Exam not found")));
+                return;
+            }
+            String createdBy = examSnapshot.getString("createdBy");
+            if (createdBy == null || !createdBy.equals(userId)) {
+                listener.onComplete(Tasks.forException(new Exception("Unauthorized update")));
+                return;
+            }
+
+            examRef.collection("questions").get().addOnSuccessListener(currentQuestionsSnapshot -> {
+
+                WriteBatch batch = db.batch();
+
+                Set<String> currentQuestionIds = new HashSet<>();
+                for (DocumentSnapshot doc : currentQuestionsSnapshot.getDocuments()) {
+                    currentQuestionIds.add(doc.getId());
+                }
+
+                Set<String> processedUpdatedIds = new HashSet<>();
+                for (Question question : updatedQuestions) {
+                    String questionId = question.getId();
+                    if (questionId != null && !questionId.isEmpty() && currentQuestionIds.contains(questionId)) {
+                        DocumentReference qRef = examRef.collection("questions").document(questionId);
+                        batch.set(qRef, question);
+                        processedUpdatedIds.add(questionId);
+                        Log.d("ExamController", "Adding update to batch for question ID: " + questionId);
+                    } else {
+                        String newQId = examRef.collection("questions").document().getId();
+                        question.setId(newQId);
+                        DocumentReference newQRef = examRef.collection("questions").document(newQId);
+                        batch.set(newQRef, question);
+                        processedUpdatedIds.add(newQId);
+                        Log.d("ExamController", "Adding new question to batch with ID: " + newQId);
+                    }
+                }
+
+                for (String idToDelete : currentQuestionIds) {
+                    if (!processedUpdatedIds.contains(idToDelete)) {
+                        DocumentReference qRefToDelete = examRef.collection("questions").document(idToDelete);
+                        batch.delete(qRefToDelete);
+                        Log.d("ExamController", "Adding delete to batch for question ID: " + idToDelete);
+                    }
+                }
+
+                Map<String, Object> examUpdates = new HashMap<>();
+                examUpdates.put("title", updatedExam.getTitle());
+                examUpdates.put("duration", updatedExam.getDuration());
+                examUpdates.put("sessionId", updatedExam.getSessionId());
+                examUpdates.put("assessment_id", updatedExam.getAssessment_id());
+
+                batch.update(examRef, examUpdates);
+                Log.d("ExamController", "Adding main exam update to batch for exam ID: " + examId);
+
+                batch.commit()
+                        .addOnCompleteListener(listener);
+
+            }).addOnFailureListener(e -> {
+                listener.onComplete(Tasks.forException(e));
+                Log.e("ExamController", "Failed to fetch current questions for exam: " + examId, e);
+            });
+
+        }).addOnFailureListener(e -> {
+            listener.onComplete(Tasks.forException(e));
+            Log.e("ExamController", "Failed to fetch exam details for update: " + examId, e);
+        });
     }
 }

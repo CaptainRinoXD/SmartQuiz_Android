@@ -13,7 +13,7 @@
         android:elevation="8dp"
         android:orientation="vertical"
         android:padding="12dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,32 +24,14 @@
             android:layout_width="224dp"
             android:layout_height="122dp"
             android:padding="8dp"
-            android:text="Upload đề"
+            android:text="Trang chính"
             android:textSize="18sp" />
-
-
         <TextView
             android:id="@+id/classes"
             android:layout_width="224dp"
             android:layout_height="122dp"
             android:padding="8dp"
             android:text="Lớp Học"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/menu_test"
-            android:layout_width="223dp"
-            android:layout_height="111dp"
-            android:padding="8dp"
-            android:text="Sửa đề"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/menu_answer"
-            android:layout_width="222dp"
-            android:layout_height="145dp"
-            android:padding="8dp"
-            android:text="Tạo đề"
             android:textSize="18sp" />
 
         <TextView

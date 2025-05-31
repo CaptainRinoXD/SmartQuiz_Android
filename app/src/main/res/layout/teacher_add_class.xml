@@ -10,9 +10,11 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="94dp"
+        android:layout_marginTop="4dp"
         android:elevation="4dp"
         android:translationZ="4dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -41,13 +43,13 @@
             android:layout_marginEnd="21dp"
             android:layout_marginBottom="25dp"
             android:background="@null"
+            android:contentDescription="Menu Button"
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/user_name"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/menu"
-            android:contentDescription="Menu Button" />
+            app:srcCompat="@drawable/menu" />
 
         <ImageButton
             android:id="@+id/imageButton4"
@@ -58,13 +60,13 @@
             android:layout_marginEnd="17dp"
             android:layout_marginBottom="13dp"
             android:background="@null"
+            android:contentDescription="User Profile Button"
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/user_name"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/user"
-            android:contentDescription="User Profile Button" />
+            app:srcCompat="@drawable/user" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
