@@ -1,15 +1,21 @@
 package com.example.smartquiz.TeacherActiviy;
 
+import android.app.Dialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,7 +33,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TeacherAddExamManualActivity extends AppCompatActivity {
+public class TeacherAddExamManualActivity extends AppCompatActivity implements TeacherUploadDialog.UploadDialogListener {
 
     private LinearLayout questionContainer;
     private Button addQuestionBtn, uploadExamBtn;
@@ -40,6 +46,10 @@ public class TeacherAddExamManualActivity extends AppCompatActivity {
     private List<String> sessionIds;
     private boolean isUpadate = false;
 
+    private List<Question> questionsList = new ArrayList<>();
+    private TeacherUploadDialog currentDialog;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,13 +58,16 @@ public class TeacherAddExamManualActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
+
         //Header_Controller_Teacher.setup(this);
+        Button btn_upload_exam = findViewById(R.id.btn_upload_exam);
         Assessment_id = getIntent().getStringExtra("ASSESSMENT_ID");
         Exam_title = getIntent().getStringExtra("EXAM_TITLE");
         Duration = getIntent().getIntExtra("DURATION", 0);
         sessionIds = getIntent().getStringArrayListExtra("SESSION_LIST");
         try {
             examId = getIntent().getStringExtra("EXAM_ID");
+            if(examId != null) {btn_upload_exam.setVisibility(View.GONE);}
             created_by= getIntent().getStringExtra("CREATED_BY");
             if (examId!= null) {isUpadate = true;}
             ExamController examController = new ExamController();
@@ -97,6 +110,9 @@ public class TeacherAddExamManualActivity extends AppCompatActivity {
             });
         } catch (Exception e) {}
 
+        btn_upload_exam.setOnClickListener(v -> {
+            uploadExamReal();
+        });
 
         questionContainer = findViewById(R.id.question_container);
         addQuestionBtn = findViewById(R.id.btn_add_question);
@@ -106,10 +122,19 @@ public class TeacherAddExamManualActivity extends AppCompatActivity {
         uploadExamBtn.setOnClickListener(v -> uploadExam());
     }
 
+    private void uploadExamReal() {
+        showUploadDialog();
+    }
+
     private void addQuestionItem() {
         Log.d("TeacherAddExam", "addQuestionItem() called");
         View questionItem = LayoutInflater.from(this).inflate(R.layout.question_item, questionContainer, false);
         questionContainer.addView(questionItem);
+    }
+
+    private void showUploadDialog() {
+        currentDialog = new TeacherUploadDialog(this, this);
+        currentDialog.show();
     }
 
 
@@ -201,4 +226,92 @@ public class TeacherAddExamManualActivity extends AppCompatActivity {
             });
         }
     }
+
+
+    @Override
+    public void onUploadSuccess(List<Question> questions, String message) {
+        runOnUiThread(() -> {
+            this.questionsList = questions;
+            displayQuestions();
+            Toast.makeText(this, message + "\nLoaded " + questions.size() + " questions",
+                    Toast.LENGTH_LONG).show();
+            Log.d("TeacherMain", "Successfully loaded " + questions.size() + " questions");
+        });
+    }
+
+    private void displayQuestions(){
+        for (Question question : questionsList) {
+            List<String> answersList = question.getAnswers();
+            int correctIndex = question.getCorrectAnswerIndex();
+
+
+            addQuestionItem();
+            View questionItem = questionContainer.getChildAt(questionContainer.getChildCount() - 1);
+
+            EditText edtQuestion = questionItem.findViewById(R.id.edt_question_text);
+            EditText edtAnswerA = questionItem.findViewById(R.id.edt_answer_0);
+            EditText edtAnswerB = questionItem.findViewById(R.id.edt_answer_1);
+            EditText edtAnswerC = questionItem.findViewById(R.id.edt_answer_2);
+            EditText edtAnswerD = questionItem.findViewById(R.id.edt_answer_3);
+            RadioGroup radioGroup = questionItem.findViewById(R.id.radio_group_answers);
+
+            edtQuestion.setText(question.getQuestionText());
+            edtAnswerA.setText(answersList.get(0));
+            edtAnswerB.setText(answersList.get(1));
+            edtAnswerC.setText(answersList.get(2));
+            edtAnswerD.setText(answersList.get(3));
+
+            if(correctIndex == 0) {
+                radioGroup.check(R.id.radio_answer_0);
+            } else if(correctIndex == 1) {
+                radioGroup.check(R.id.radio_answer_1);
+            } else if (correctIndex == 2) {
+                radioGroup.check(R.id.radio_answer_2);
+            } else if (correctIndex == 3) {
+                radioGroup.check(R.id.radio_answer_3);
+            }
+        }
+    }
+
+    @Override
+    public void onUploadError(String errorMessage) {
+        runOnUiThread(() -> {
+            Toast.makeText(this, "Upload failed: " + errorMessage, Toast.LENGTH_LONG).show();
+            Log.e("TeacherMain", "Upload error: " + errorMessage);
+        });
+    }
+
+    @Override
+    public void onCancelClicked() {
+        Log.d("TeacherMain", "Upload cancelled");
+    }
+
+    @Override
+    public void onFileSelectionRequested() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("application/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        // Filter for Word documents
+        String[] mimeTypes = {
+                "application/msword", // .doc
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document" // .docx
+        };
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+
+        selectFileLauncher.launch(intent);
+    }
+
+    private final ActivityResultLauncher<Intent> selectFileLauncher =
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                Uri selectedFileUri = result.getData().getData();
+                if (currentDialog != null && selectedFileUri != null) {
+                    currentDialog.onFileSelected(selectedFileUri);
+                }
+            }
+        });
+
+
+
 }

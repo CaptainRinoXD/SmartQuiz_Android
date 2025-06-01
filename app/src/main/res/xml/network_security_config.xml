@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
-</PreferenceScreen>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <!-- If running on an emulator and your server is on your host machine,
+             you might also need to allow 10.0.2.2 which maps to your host's localhost -->
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <!-- If using your actual local IP address (e.g., 192.168.1.X) directly from a device,
+             add that here as well -->
+    </domain-config>
+</network-security-config>
