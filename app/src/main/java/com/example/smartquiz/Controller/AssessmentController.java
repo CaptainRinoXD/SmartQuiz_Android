@@ -11,6 +11,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
 
@@ -146,18 +147,18 @@ public class AssessmentController extends BaseController{
         }).addOnCompleteListener(listener);
     }
 
-    // Lấy tất cả sinh viên chưa được chọn trong assessment
-    public void getUnselectedStudents(String assessmentId, OnSuccessListener<List<Assessment.StudentInfo>> listener) {
-        db.collection("Assessment").document(assessmentId)
+    public void getAllStudents(String classId, OnSuccessListener<List<Assessment.StudentInfo>> listener) {
+        db.collection("Assessment")
+                .whereArrayContains("classId", classId) // Use whereArrayContains for list fields
                 .get()
                 .addOnSuccessListener(snapshot -> {
                     List<Assessment.StudentInfo> result = new ArrayList<>();
-                    if (snapshot.exists()) {
-                        Assessment assess = snapshot.toObject(Assessment.class);
+                    // Iterate through each document in the QuerySnapshot
+                    for (QueryDocumentSnapshot document : snapshot) {
+                        Assessment assess = document.toObject(Assessment.class);
                         if (assess != null && assess.getStudent() != null) {
-                            for (Assessment.StudentInfo s : assess.getStudent()) {
-                                if (!s.isSelected()) result.add(s);
-                            }
+                            // Add all students from the current assessment to the result list
+                            result.addAll(assess.getStudent());
                         }
                     }
                     listener.onSuccess(result);

@@ -25,6 +25,7 @@ import com.example.smartquiz.Controller.ClassesController;
 import com.example.smartquiz.Controller.UserController;
 import com.example.smartquiz.Header_Controller_Teacher;
 import com.example.smartquiz.Model.Assessment;
+import com.example.smartquiz.Model.AssessmentSession;
 import com.example.smartquiz.Model.Class;
 import com.example.smartquiz.Model.User;
 import com.example.smartquiz.R;
@@ -33,6 +34,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class TeacherListAssessmentActivity extends AppCompatActivity {
     TextView class_name;
@@ -192,14 +197,24 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
                     return;
                 }
                 updateAssessment.setTitle(AssessmentNameText.getText().toString());
-                updateAssessment.setStudent(studentInfoList);
-                AssessmentController assessmentController = new AssessmentController();
-                assessmentController.updateAssessment(updateAssessment.getId(),updateAssessment, (task) -> {
-                    if(task.isSuccessful()) {
-                        Toast.makeText(TeacherListAssessmentActivity.this, "Assessment updated successfully", Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
-                    } else {
-                        Toast.makeText(TeacherListAssessmentActivity.this, "Failed to update assessment", Toast.LENGTH_SHORT).show();
+
+                canUpdate(updateAssessment.getId(),studentInfoList, new OnCanUpdateCheckListener() {
+                    @Override
+                    public void onCheckResult(boolean canUpdate) {
+                        if(canUpdate) {
+                            AssessmentController assessmentController = new AssessmentController();
+                            updateAssessment.setStudent(studentInfoList);
+                            assessmentController.updateAssessment(updateAssessment.getId(),updateAssessment, (task) -> {
+                                if(task.isSuccessful()) {
+                                    Toast.makeText(TeacherListAssessmentActivity.this, "Assessment updated successfully", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                } else {
+                                    Toast.makeText(TeacherListAssessmentActivity.this, "Failed to update assessment", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else{
+                            Toast.makeText(TeacherListAssessmentActivity.this,"Không thể update vì học sinh vẫn còn trong ca thi!", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
             });
@@ -207,6 +222,78 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
 
     }
 
+    interface OnCanUpdateCheckListener {
+        void onCheckResult(boolean canUpdate);
+    }
+
+    private void canUpdate(
+            String assessmentId,
+            List<Assessment.StudentInfo> newStudentInfoList,
+            OnCanUpdateCheckListener listener) {
+
+        AssessmentController assessmentController = new AssessmentController();
+        final boolean[] canProceed = {true}; // Use an array for effective finality in lambda
+
+        // 1. Fetch the current assessment details to identify students being removed
+        assessmentController.getAssessmentById(assessmentId, task -> {
+            if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                Assessment currentAssessment = task.getResult().toObject(Assessment.class);
+
+                List<Assessment.StudentInfo> currentStudents = (currentAssessment != null && currentAssessment.getStudent() != null)
+                        ? currentAssessment.getStudent()
+                        : new ArrayList<>(); // Handle null case for current students
+
+                // Identify students that are in the *current* list but *not* in the *new* list (i.e., being removed)
+                Set<String> newStudentUserIds = newStudentInfoList.stream()
+                        .map(Assessment.StudentInfo::getUserId)
+                        .collect(Collectors.toSet());
+
+                List<String> removedStudentUserIds = currentStudents.stream()
+                        .filter(s -> !newStudentUserIds.contains(s.getUserId()))
+                        .map(Assessment.StudentInfo::getUserId)
+                        .collect(Collectors.toList());
+
+                    if (removedStudentUserIds.isEmpty()) {
+                    // No students are being removed, so the update is safe.
+                    listener.onCheckResult(true);
+                    return;
+                }
+
+                // 2. Check if any of the removed students are present in any session
+                assessmentController.getAllSessions(assessmentId, (value, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Error getting sessions: " + error.getMessage());
+                        listener.onCheckResult(false); // Assume cannot update on error
+                        return;
+                    }
+
+                    if (value != null && !value.isEmpty()) {
+                        for (DocumentSnapshot document : value.getDocuments()) {
+                            AssessmentSession session = document.toObject(AssessmentSession.class);
+                            if (session != null && session.getStudentsInSession() != null) {
+                                for (String removedUserId : removedStudentUserIds) {
+                                    if (session.getStudentsInSession().contains(removedUserId)) {
+                                        // Found a removed student in a session, so cannot proceed
+                                        canProceed[0] = false;
+                                        break; // No need to check further sessions or students
+                                    }
+                                }
+                                if (!canProceed[0]) {
+                                    break; // Break from the session loop if a conflict is found
+                                }
+                            }
+                        }
+                    }
+                    // Deliver the final result via the callback
+                    listener.onCheckResult(canProceed[0]);
+                });
+
+            } else {
+                Log.e(TAG, "Error getting assessment: " + (task.getException() != null ? task.getException().getMessage() : "Unknown error"));
+                listener.onCheckResult(false); // Cannot update if assessment details can't be fetched
+            }
+        });
+    }
     private void getCheckBoxAssessment(LinearLayout student_list,
                                        List<Assessment.StudentInfo> studentInfoList) {
         for (int i = 0; i < student_list.getChildCount(); i++) {
@@ -214,11 +301,18 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
             if (child instanceof CheckBox) {
                 CheckBox checkBox = (CheckBox) child;
                 if (checkBox.isChecked()) {
-                    String studentId = (String) checkBox.getTag();
-                    Assessment.StudentInfo studentInfo = new Assessment.StudentInfo();
-                    studentInfo.setUserId(studentId);
-                    studentInfo.setSelected(false);
-                    studentInfoList.add(studentInfo);
+                    String studentIdExist = (String) checkBox.getTag(R.id.student_uid_tag_key);
+                    if (studentIdExist != null) {
+                        Assessment.StudentInfo studentInfo = new Assessment.StudentInfo();
+                        studentInfo.setUserId(studentIdExist);
+                        studentInfo.setSelected(true);
+                        studentInfoList.add(studentInfo);
+                    } else {
+                        String studentId = (String) checkBox.getTag();
+                        Assessment.StudentInfo studentInfo = new Assessment.StudentInfo();
+                        studentInfo.setUserId(studentId);
+                        studentInfo.setSelected(false);
+                        studentInfoList.add(studentInfo);}
                 }
             }
         }
@@ -267,6 +361,7 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
                                     for (Assessment.StudentInfo studentInfo : updateAssessment.getStudent()) {
                                         if (studentInfo.getUserId().equals(student.getUid())) {
                                             studentCheckbox.setChecked(true);
+                                            studentCheckbox.setTag(R.id.student_uid_tag_key,student.getUid());
                                             break;
                                         } else {
                                             studentCheckbox.setChecked(false);

@@ -95,6 +95,12 @@ public class ExamController extends BaseController {
         db.collection("exams").addSnapshotListener(listener);
     }
 
+    public void fetchAllExamsByUserId(EventListener<QuerySnapshot> listener) {
+        String userId = getCurrentUserId();
+        db.collection("exams").whereEqualTo("createdBy", userId).addSnapshotListener(listener);
+    }
+
+
     @FunctionalInterface
     public interface SessionResultCallback {
         void onResult(List<AssessmentSession> sessions, Exception error);

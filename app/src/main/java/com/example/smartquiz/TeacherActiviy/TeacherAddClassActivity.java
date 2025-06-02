@@ -1,6 +1,8 @@
 package com.example.smartquiz.TeacherActiviy;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -27,9 +29,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.smartquiz.Controller.AssessmentController;
 import com.example.smartquiz.Controller.ClassesController;
 import com.example.smartquiz.Controller.UserController;
 import com.example.smartquiz.Header_Controller_Teacher;
+import com.example.smartquiz.Model.Assessment;
 import com.example.smartquiz.Model.Class;
 import com.example.smartquiz.Model.User;
 import com.example.smartquiz.R;
@@ -38,13 +42,15 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TeacherAddClassActivity extends AppCompatActivity {
     Button submitClassBtn;
     Button cancelClassBtn;
     ImageButton add_btnStudent;
     EditText classNameText;
-    List<User> studentArayList;
+    List<User> studentArayListToDisplay;
+    List<String> studentAlreadyInClass;
     List<String> studentArrayListString;
     LinearLayout studentToAddList;
     TextView emptyStateTextView;
@@ -73,8 +79,9 @@ public class TeacherAddClassActivity extends AppCompatActivity {
         emptyStateTextView = findViewById(R.id.emptyStateTextView);
         classNameText = findViewById(R.id.ExamNameText);
 
-        studentArayList = new ArrayList<>();
+        studentArayListToDisplay = new ArrayList<>();
         studentArrayListString = new ArrayList<>();
+        studentAlreadyInClass = new ArrayList<>();
 
         boolean isUpdate = getIntent().getBooleanExtra("isUpdate", false);
         if(isUpdate) {
@@ -88,6 +95,10 @@ public class TeacherAddClassActivity extends AppCompatActivity {
 
         submitClassBtn.setOnClickListener(v->{
             summitCreateClass(isUpdate);
+        });
+
+        cancelClassBtn.setOnClickListener(v->{
+            finish();
         });
 
 
@@ -106,13 +117,22 @@ public class TeacherAddClassActivity extends AppCompatActivity {
                     Log.d(TAG, "Class is null");
                     return;
                 }
+
+                AssessmentController assessmentController = new AssessmentController();
+                assessmentController.getAllStudents(classId,(studentInfos)->{
+                    for (Assessment.StudentInfo studentInfo : studentInfos) {
+                        Log.d(TAG, "studentInfo: " + studentInfo.getUserId());
+                        studentAlreadyInClass.add(studentInfo.getUserId());
+                    }
+                });
+
                 UserController userController = new UserController();
                 for (String studentId : currClass.getStudentsId()) {
                     userController.getUserIdDocument(studentId, (value,error) -> {
                         if(value != null) {
                             User student = value.toObject(User.class);
                             if( student != null) {
-                                studentArayList.add(student);
+                                studentArayListToDisplay.add(student);
                                 refreshStudentList();
                             }
                         }
@@ -266,8 +286,8 @@ public class TeacherAddClassActivity extends AppCompatActivity {
                 String selectedUserEmail = selectedUser.getEmail();
 
                 boolean alreadyExists = false;
-                if (studentArayList != null) {
-                    for (User u : studentArayList) {
+                if (studentArayListToDisplay != null) {
+                    for (User u : studentArayListToDisplay) {
                         if (u != null && u.getUid() != null && u.getUid().equals(selectedUserId)) {
                             alreadyExists = true;
                             break;
@@ -279,10 +299,10 @@ public class TeacherAddClassActivity extends AppCompatActivity {
                     Toast.makeText(this, "Học sinh này đã được thêm rồi.", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "Học sinh " + selectedUserEmail + " đã tồn tại trong danh sách.");
                 } else {
-                    studentArayList.add(selectedUser);
+                    studentArayListToDisplay.add(selectedUser);
                     refreshStudentList();
                     Toast.makeText(this, "Thêm học sinh với Email: " + selectedRadioButton.getText(), Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "studentArayList:" + studentArayList);
+                    Log.d(TAG, "studentArayList:" + studentArayListToDisplay);
                     }
 
             } else {
@@ -296,9 +316,9 @@ public class TeacherAddClassActivity extends AppCompatActivity {
     private void refreshStudentList() {
         studentToAddList.removeAllViews();
         studentArrayListString.clear();
-        if (studentArayList != null) {
+        if (studentArayListToDisplay != null) {
             emptyStateTextView.setVisibility(View.GONE);
-            for (User student : studentArayList) {
+            for (User student : studentArayListToDisplay) {
                 if(student.getName()==null){return;}
                 String name = student.getName();
                 TextView studentTextView = new TextView(this);
@@ -311,6 +331,43 @@ public class TeacherAddClassActivity extends AppCompatActivity {
                 studentTextView.setTextSize(20);
                 studentTextView.setTypeface(null, Typeface.ITALIC);
                 studentTextView.setTextColor(Color.BLACK);
+
+                studentTextView.setOnLongClickListener(v->{
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("Xóa sinh viên: "+name )
+                            .setTitle("Xác nhận xóa");
+//                    final Boolean[] canDelete = {true};
+
+                    builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            for (String studentId : studentAlreadyInClass) {
+                                Log.d(TAG,"Student In Array: " +studentId +"student to compare:"+ student.getUid());
+                                if (Objects.equals(studentId, student.getUid())) {
+                                    Toast.makeText(TeacherAddClassActivity.this, "Sinh Viên đã có trong ca thi, không thể xóa.", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                            }
+
+                            studentArayListToDisplay.remove(student);
+                            Toast.makeText(TeacherAddClassActivity.this, "Xóa thành công.", Toast.LENGTH_SHORT).show();
+                            refreshStudentList();
+                            dialog.dismiss();
+
+                        }
+                    });
+
+                    builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    AlertDialog dialog = builder.create();
+
+                    dialog.show();
+                    return true;
+                });
 
                 if(student.getUid() != null){
                     studentArrayListString.add(student.getUid());

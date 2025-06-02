@@ -9,6 +9,7 @@
     <!-- ScrollView chứa danh sách câu hỏi -->
 
     <!-- Layout chứa 2 nút Thêm câu hỏi và Tải đề -->
+
     <LinearLayout
         android:layout_width="411dp"
         android:layout_height="60dp"
@@ -17,8 +18,10 @@
         android:padding="4dp"
         app:layout_constraintBottom_toTopOf="@+id/scrollViewQuestions"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.333">
 
         <Button
             android:id="@+id/btn_upload_exam"
@@ -39,7 +42,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.914">
+        app:layout_constraintVertical_bias="0.853">
 
         <LinearLayout
             android:id="@+id/question_container"
