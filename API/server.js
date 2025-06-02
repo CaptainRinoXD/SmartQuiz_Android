@@ -44,77 +44,159 @@ app.use((req, res, next) => {
 });
 
 /**
- * Parse Vietnamese quiz document content
- * Expected format: Câu X: question text (đáp án Y)
- * A.answer1    B.answer2    C.answer3    D.answer4
+ * Parse Vietnamese quiz document content - SUPER ROBUST VERSION
+ * Handles all kinds of formatting inconsistencies
  */
 function parseQuizContent(text) {
+    console.log('=== DEBUG: Raw extracted text ===');
+    console.log('Raw text:', JSON.stringify(text));
+    console.log('================================');
+    
     const questions = [];
-    const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    // Clean up the text first - remove backslashes and normalize line breaks
+    const cleanText = text.replace(/\\\s*$/gm, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const lines = cleanText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    
+    console.log('=== DEBUG: Lines after split ===');
+    lines.forEach((line, index) => {
+        console.log(`Line ${index}: "${line}"`);
+    });
+    console.log('===============================');
     
     let currentQuestion = null;
     
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
+        console.log(`\n=== Processing line ${i}: "${line}" ===`);
         
-        // Check if line starts with "Câu" (Question)
-        if (line.match(/^Câu\s+\d+:/)) {
+        // Check if line starts with "Câu" (Question) - handle both "đáp án" and "Đáp án"
+        const questionRegex = /^Câu\s+\d+:/i;
+        if (line.match(questionRegex)) {
+            console.log('✓ Found question line');
+            
             // Save previous question if exists
             if (currentQuestion && currentQuestion.answers && currentQuestion.answers.length > 0) {
+                console.log('✓ Saving previous question:', currentQuestion.questionText);
                 questions.push(currentQuestion);
             }
             
-            // Extract question text and correct answer
-            const questionMatch = line.match(/^Câu\s+\d+:\s*(.+?)\s*\(đáp án\s+([A-D])\)/i);
+            // Extract question text and correct answer - handle both "đáp án" and "Đáp án"
+            const questionMatch = line.match(/^Câu\s+\d+:\s*(.+?)\s*\([Đđ]áp án\s+([A-D])\)/i);
             if (questionMatch) {
                 const questionText = questionMatch[1].trim();
                 const correctAnswerLetter = questionMatch[2].toUpperCase();
                 
-                // Convert letter to index (A=0, B=1, C=2, D=3)
+                console.log('✓ Question text:', questionText);
+                console.log('✓ Correct answer:', correctAnswerLetter);
+                
                 const correctAnswerIndex = correctAnswerLetter.charCodeAt(0) - 'A'.charCodeAt(0);
                 
                 currentQuestion = {
-                    id: uuidv4(),
+                    id: require('uuid').v4(),
                     questionText: questionText,
                     answers: [],
                     correctAnswerIndex: correctAnswerIndex
                 };
+                console.log('✓ Created question object');
+            } else {
+                console.log('✗ Failed to match question pattern');
+                console.log('  Trying alternative patterns...');
+                
+                // Try alternative pattern without parentheses
+                const altMatch = line.match(/^Câu\s+\d+:\s*(.+)/i);
+                if (altMatch) {
+                    console.log('✓ Found question with alternative pattern');
+                    currentQuestion = {
+                        id: require('uuid').v4(),
+                        questionText: altMatch[1].trim(),
+                        answers: [],
+                        correctAnswerIndex: 0 // Default to A if not found
+                    };
+                }
             }
         }
-        // Check if line contains answer options (A. B. C. D.)
-        else if (currentQuestion && line.match(/[A-D]\./)) {
-            // Parse answers from line like "A.answer1      B.answer2    C.answer3    D.answer4"
-            const answerPattern = /([A-D])\.\s*([^A-D]*?)(?=\s*[A-D]\.|$)/g;
+        // Check if line contains answer options - VERY FLEXIBLE REGEX
+        else if (currentQuestion && line.match(/[A-D]\s*\./)) {
+            console.log('✓ Found answer line');
+            
+            // SUPER flexible answer pattern that handles:
+            // A.text, A. text, A .text, A . text
+            // Fixed to properly handle cases where answer text contains A, B, C, D letters
+            const answerPattern = /([A-D])\s*\.\s*(.*?)(?=\s+[A-D]\s*\.|$)/g;
             let answerMatch;
             const tempAnswers = [];
             
+            // Reset regex lastIndex to ensure it starts from beginning
+            answerPattern.lastIndex = 0;
+            
+            console.log('  Trying to extract answers from:', line);
+            
             while ((answerMatch = answerPattern.exec(line)) !== null) {
+                const answerLetter = answerMatch[1];
                 const answerText = answerMatch[2].trim();
+                console.log(`  Found answer: ${answerLetter} = "${answerText}"`);
                 if (answerText) {
                     tempAnswers.push(answerText);
                 }
             }
             
-            if (tempAnswers.length > 0) {
-                currentQuestion.answers = tempAnswers;
-            }
-        }
-        // Handle case where answers might be on separate lines
-        else if (currentQuestion && currentQuestion.answers.length < 4) {
-            const singleAnswerMatch = line.match(/^([A-D])\.\s*(.+)/);
-            if (singleAnswerMatch) {
-                const answerText = singleAnswerMatch[2].trim();
-                if (answerText) {
-                    currentQuestion.answers.push(answerText);
+            // If regex didn't work, try manual parsing
+            if (tempAnswers.length === 0) {
+                console.log('  Regex failed, trying manual parsing...');
+                // Split by spaces and look for A. B. C. D. patterns
+                const parts = line.split(/\s+/);
+                let currentAnswer = '';
+                let currentLetter = '';
+                
+                for (let j = 0; j < parts.length; j++) {
+                    const part = parts[j];
+                    // Check if this part starts with A. B. C. or D.
+                    const letterMatch = part.match(/^([A-D])\s*\.(.*)$/);
+                    if (letterMatch) {
+                        // Save previous answer if exists
+                        if (currentLetter && currentAnswer.trim()) {
+                            tempAnswers.push(currentAnswer.trim());
+                            console.log(`  Manual: ${currentLetter} = "${currentAnswer.trim()}"`);
+                        }
+                        // Start new answer
+                        currentLetter = letterMatch[1];
+                        currentAnswer = letterMatch[2] || '';
+                    } else if (currentLetter) {
+                        // Continue building current answer
+                        currentAnswer += ' ' + part;
+                    }
+                }
+                // Don't forget the last answer
+                if (currentLetter && currentAnswer.trim()) {
+                    tempAnswers.push(currentAnswer.trim());
+                    console.log(`  Manual: ${currentLetter} = "${currentAnswer.trim()}"`);
                 }
             }
+            
+            if (tempAnswers.length > 0) {
+                currentQuestion.answers = tempAnswers;
+                console.log('✓ Added answers:', tempAnswers);
+            } else {
+                console.log('✗ No answers extracted from line');
+            }
+        }
+        else {
+            console.log('✗ Line not recognized as question or answer');
         }
     }
     
     // Don't forget the last question
     if (currentQuestion && currentQuestion.answers && currentQuestion.answers.length > 0) {
+        console.log('✓ Saving last question:', currentQuestion.questionText);
         questions.push(currentQuestion);
     }
+    
+    console.log(`\n=== FINAL RESULT: Found ${questions.length} questions ===`);
+    questions.forEach((q, index) => {
+        console.log(`Question ${index + 1}: "${q.questionText}"`);
+        console.log(`  Answers: ${q.answers.join(', ')}`);
+        console.log(`  Correct: ${q.correctAnswerIndex} (${String.fromCharCode(65 + q.correctAnswerIndex)})`);
+    });
     
     return questions;
 }
@@ -255,8 +337,6 @@ app.use((error, req, res, next) => {
     
     res.status(500).json({
         success: false,
-        message: 'Internal server error: ' + error.message,
-        questions: []
     });
 });
 
