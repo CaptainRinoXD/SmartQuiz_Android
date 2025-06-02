@@ -47,7 +47,7 @@
         android:layout_marginBottom="10sp"
         android:background="@drawable/red_box"
         android:elevation="4dp"
-        android:text="Tải đề lên"
+        android:text="Thoát"
         android:translationZ="4dp"
         app:backgroundTint="@null"
         app:layout_constraintBottom_toBottomOf="parent"

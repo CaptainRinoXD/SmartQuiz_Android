@@ -89,7 +89,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
-            android:text="Danh Sách Kỳ Thi Của Lớp:"
+            android:text="Danh Sách Kỳ Thi Lớp:"
             android:textColor="@android:color/holo_blue_dark"
             android:textSize="24dp"
             android:textStyle="bold"
@@ -135,7 +135,6 @@
                 android:id="@+id/scroll_view_assessment_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15sp"
                 android:orientation="vertical"
                 tools:context=".MainActivity" />
         </ScrollView>

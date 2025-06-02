@@ -3,8 +3,10 @@ package com.example.smartquiz.TeacherActiviy;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +47,7 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
     List<Assessment> assessmentsList;
     TextView emptyStateTextView;
     ImageButton add_btnAssessment;
+    TextView textView13;
     String classId;
     final static String TAG ="TeacherListAssessmentActivity";
     @Override
@@ -60,6 +63,7 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
         emptyStateTextView = findViewById(R.id.emptyStateTextView);
         add_btnAssessment = findViewById(R.id.add_btnAssessment);
         assessmentsList = new ArrayList<>();
+
 
         Header_Controller_Teacher.setup(this);
        classId = getIntent().getStringExtra("CLASS_ID");
@@ -100,19 +104,68 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
     }
 
     private void displayAssessment(Assessment assessment) {
-        TextView assessmentTextView = new TextView(this);
+
+
+
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
-        int marginVerticalPx = dpToPx(4);
-        int paddingPx = dpToPx(16);
+        params.setMargins(16, 32, 16, 8);
+        LinearLayout examContainer = new LinearLayout(TeacherListAssessmentActivity.this);
+        examContainer.setOrientation(LinearLayout.VERTICAL);
+        examContainer.setLayoutParams(params);
+        examContainer.setBackgroundResource(R.drawable.blue_box);
 
-        params.setMargins(paddingPx, marginVerticalPx, paddingPx, marginVerticalPx);
+        //Create Text view for assessment title
+        int paddingPx = dpToPx(16);
+        TextView assessmentTextView = new TextView(this);
         assessmentTextView.setText(assessment.getTitle());
-        assessmentTextView.setLayoutParams(params);
         assessmentTextView.setBackgroundResource(R.drawable.light_blue);
-        assessmentTextView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
-        ln_assessment_list.addView(assessmentTextView);
+        assessmentTextView.setPadding(paddingPx, dpToPx(4), paddingPx, dpToPx(4));
+        assessmentTextView.setTypeface(null, Typeface.BOLD_ITALIC);
+        assessmentTextView.setBackgroundResource(R.drawable.light_blue);
+        assessmentTextView.setTextSize(dpToPx(10));
+        assessmentTextView.setTextColor(Color.BLACK);
+        assessmentTextView.setElevation(dpToPx(6));
+        assessmentTextView.setTranslationZ(dpToPx(6));
+        examContainer.addView(assessmentTextView);
+
+        //Create text view to show count of student
+        TextView studentCountTextView = new TextView(this);
+        studentCountTextView.setText("Số học sinh trong kì thi: " + assessment.getStudent().size());
+        studentCountTextView.setTypeface(null, Typeface.BOLD_ITALIC);
+        studentCountTextView.setTextSize(dpToPx(6));;
+        studentCountTextView.setPadding(paddingPx, 0, paddingPx, 0);
+        examContainer.addView(studentCountTextView);
+
+        //Create button to show all student submission
+        Button showStudentButton = new Button(this);
+        showStudentButton.setText("Xem điểm");
+        showStudentButton.setBackgroundResource(R.drawable.light_blue);
+        showStudentButton.setBackgroundTintMode(null);
+        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        buttonParams.setMargins(dpToPx(2), dpToPx(2), dpToPx(2), dpToPx(2)); // L, T, R, B
+        buttonParams.gravity = Gravity.START;
+        // Or align to the end (right for LTR languages):
+        // buttonParams.gravity = Gravity.END;
+        // Or align to the start (left for LTR languages):
+        // buttonParams.gravity = Gravity.START;
+        showStudentButton.setLayoutParams(buttonParams);
+        showStudentButton.setOnClickListener(v -> {
+            Intent intent = new Intent(TeacherListAssessmentActivity.this, TeacherViewStudentScore.class);
+            intent.putExtra("ASSESSMENT_ID", assessment.getId());
+            startActivity(intent);
+        });
+
+
+
+        examContainer.addView(showStudentButton);
+
+
+        ln_assessment_list.addView(examContainer);
 
         assessmentTextView.setOnClickListener(v -> {
             Intent intent = new Intent(TeacherListAssessmentActivity.this, TeacherAddAssessmentActivity.class);
@@ -141,7 +194,7 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
         // Inflate the custom layout for the dialog
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_teacher_create_assessment, null);
         dialog.setContentView(dialogView);
-
+        textView13 = dialogView.findViewById(R.id.textView13);
         TextView class_nameDialog = dialogView.findViewById(R.id.class_name);
         TextView emptyStateTextViewDialog = dialogView.findViewById(R.id.emptyStateTextView);
         EditText AssessmentNameText = dialogView.findViewById(R.id.ExamNameText);
@@ -188,6 +241,7 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
                 });
             });
         } else {
+            textView13.setText("Cập nhật kì thi");
             createAssessmentBtn.setText("Cập nhật");
             AssessmentNameText.setText(updateAssessment.getTitle());
             createAssessmentBtn.setOnClickListener(view-> {

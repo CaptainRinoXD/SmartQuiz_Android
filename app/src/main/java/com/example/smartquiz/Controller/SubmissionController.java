@@ -9,6 +9,7 @@ import com.example.smartquiz.Model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -172,6 +173,23 @@ public class SubmissionController extends BaseController {
                     } else {
                         listener.onSuccess(null);
                     }
+                });
+    }
+
+    public void getSubmissionByAssessmentId(String assessmentId, OnSuccessListener<List<Submission>> listener) {
+        db.collection("submissions")
+                .whereEqualTo("assessmentId", assessmentId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<Submission> submissions = new ArrayList<>();
+                    // Iterate through all documents in the query snapshot
+                    for (QueryDocumentSnapshot document : querySnapshot) {
+                        Submission submission = document.toObject(Submission.class);
+                        if (submission != null) {
+                            submissions.add(submission);
+                        }
+                    }
+                    listener.onSuccess(submissions);
                 });
     }
 

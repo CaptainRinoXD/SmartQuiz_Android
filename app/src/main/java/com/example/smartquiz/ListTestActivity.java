@@ -30,6 +30,7 @@ import com.example.smartquiz.Model.AssessmentSession;
 import com.example.smartquiz.Model.Exam;
 import com.example.smartquiz.Model.Submission;
 import com.example.smartquiz.TeacherActiviy.TeacherAddAssessmentActivity;
+import com.example.smartquiz.Util.LoadingDialogFragment;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.Timestamp;
 
@@ -44,6 +45,8 @@ import java.util.concurrent.TimeUnit;
 public class ListTestActivity extends AppCompatActivity {
 
     //private  Header_Controller headerController;
+    private TextView emptyStateTextView;
+    private LoadingDialogFragment loadingDialog;
     private ExamController examController;
     private LinearLayout topicListLayout;
     private static final String TAG = "ListTestActivity";
@@ -63,12 +66,14 @@ public class ListTestActivity extends AppCompatActivity {
             return insets;
         });
 
+        emptyStateTextView = findViewById(R.id.emptyStateTextView);
         examController = new ExamController();
         topicListLayout = findViewById(R.id.topic_list);
-
+        showLoading(true);
         //loadExams();
         //loadExamsWithAssessment();
         loadExamsWithAssessmentUpdate();
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -91,7 +96,9 @@ public class ListTestActivity extends AppCompatActivity {
                 return;
             }
 
-
+            if(sessions.isEmpty()){
+                showLoading(false);
+            }
             Log.d(TAG, "Fetched " + sessions.size() + " sessions.");
             if (sessions != null) {
                 for (AssessmentSession session : sessions) {
@@ -117,12 +124,13 @@ public class ListTestActivity extends AppCompatActivity {
                             checkIfStudentHasDoneAssessment(session, hasDone -> {
                                 if (hasDone) {
                                     Log.d(TAG, "Student has already done this assessment");
-                                    return;
+                                    showLoading(false);
                                 } else {
                                     ExamController examController = new ExamController();
                                     examController.fetchExamsBySessionId(session.getId(), (exams, errorSEC)->{
                                         if(errorSEC !=null) {Log.d(TAG,"errorSEC:"+ errorSEC);return;}
                                         if(exams!=null) {
+                                            emptyStateTextView.setVisibility(View.GONE);
                                             // Lấy ngẫu nhiên một đề thi từ danh sách
                                             List<Exam> examList = new ArrayList<>(exams);
                                             Exam randomExam;
@@ -138,6 +146,7 @@ public class ListTestActivity extends AppCompatActivity {
 
                                             AssessmentController assessmentController = new AssessmentController();
                                             assessmentController.getAssessmentById(session.getAssessmentId(), (task)->{
+                                                showLoading(false);
                                                 if (task.isSuccessful()) {
                                                     Assessment assessment = task.getResult().toObject(Assessment.class);
                                                     ClassesController classesController = new ClassesController();
@@ -190,10 +199,12 @@ public class ListTestActivity extends AppCompatActivity {
                             });
 
                         } else {
+                            showLoading(false);
                             // Quá giờ thi
                             Log.d("SessionCheck", "Quá hạn 30 phút.");
                         }
                     } else {
+                        showLoading(false);
                         // Chưa tới giờ thi
                         Log.d("SessionCheck", "Chưa tới giờ.");
 
@@ -368,6 +379,23 @@ public class ListTestActivity extends AppCompatActivity {
     private int dpToPx(int dp) {
         float density = getResources().getDisplayMetrics().density;
         return Math.round((float) dp * density);
+    }
+
+    private void showLoading(boolean show) {
+        if (show) {
+            if (loadingDialog == null || !loadingDialog.isVisible()) {
+                loadingDialog = LoadingDialogFragment.newInstance();
+                // Ensure LoadingDialogFragment.TAG is defined in LoadingDialogFragment
+                loadingDialog.show(getSupportFragmentManager(), LoadingDialogFragment.TAG);
+            }
+
+        } else {
+            if (loadingDialog != null && loadingDialog.isVisible()) {
+                loadingDialog.dismissAllowingStateLoss();
+            }
+            loadingDialog = null; // Clear reference
+
+        }
     }
 
 }

@@ -83,7 +83,7 @@ function parseQuizContent(text) {
         }
         // Check if line contains answer options (A. B. C. D.)
         else if (currentQuestion && line.match(/[A-D]\./)) {
-            // Parse answers from line like "A.answer1    B.answer2    C.answer3    D.answer4"
+            // Parse answers from line like "A.answer1      B.answer2    C.answer3    D.answer4"
             const answerPattern = /([A-D])\.\s*([^A-D]*?)(?=\s*[A-D]\.|$)/g;
             let answerMatch;
             const tempAnswers = [];

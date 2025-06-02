@@ -103,6 +103,21 @@
         app:layout_constraintTop_toTopOf="@+id/constraintLayout"
         app:layout_constraintVertical_bias="0.13" />
 
+    <TextView
+        android:id="@+id/emptyStateTextView"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Hiện tại chưa có bài thi nào được giao"
+        android:textColor="#888888"
+        android:textSize="20sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="@+id/down_arrow"
+        app:layout_constraintEnd_toEndOf="@+id/scroll_list"
+        app:layout_constraintStart_toStartOf="@+id/scroll_list"
+        app:layout_constraintTop_toTopOf="@+id/scroll_list"
+        tools:visibility="visible" />
+
     <ScrollView
         android:id="@+id/scroll_list"
         android:layout_width="396dp"
