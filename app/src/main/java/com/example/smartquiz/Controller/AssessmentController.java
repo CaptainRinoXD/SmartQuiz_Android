@@ -16,7 +16,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -227,6 +229,45 @@ public class AssessmentController extends BaseController{
         }).addOnCompleteListener(listener);
     }
 
+    public void updateArrayOfStudentSelection(
+            String assessmentId,
+            List<String> userIds,
+            boolean isSelected,
+            OnCompleteListener<Void> listener) {
+        DocumentReference docRef =db.collection("Assessment").document(assessmentId);
+
+        db.<Void>runTransaction(transaction -> {
+
+            Assessment assess = transaction.get(docRef).toObject(Assessment.class);
+            if (assess == null) return null;
+
+            List<Assessment.StudentInfo> list = assess.getStudent();
+            if (list == null) list = new ArrayList<>();
+
+            Map<String, Assessment.StudentInfo> studentMap = new HashMap<>();
+            for (Assessment.StudentInfo s : list) {
+                studentMap.put(s.getUserId(), s);
+            }
+            for (String userId : userIds) {
+                Assessment.StudentInfo s = studentMap.get(userId);
+                if (s != null) {
+                    s.setSelected(isSelected);
+                } else {
+                    s = new Assessment.StudentInfo();
+                    s.setUserId(userId);
+                    s.setSelected(isSelected);
+                    list.add(s);
+                    studentMap.put(userId, s);
+                }
+            }
+
+            transaction.update(docRef, "student", list);
+            return null;
+        }).addOnCompleteListener(listener);
+    }
+
+    
+
     /**
      * Xóa sinh viên trong assessment.
      * @param assessmentId ID của Assessment
@@ -339,6 +380,20 @@ public class AssessmentController extends BaseController{
             );
             return null;
         }).addOnCompleteListener(listener);
+    }
+
+    public void deleteSession(
+            String assessmentId,
+            String sessionId,
+            OnCompleteListener<Void> listener) {
+
+        DocumentReference sessionRef = db.collection("Assessment")
+                .document(assessmentId)
+                .collection("session")
+                .document(sessionId);
+
+        sessionRef.delete()
+                .addOnCompleteListener(listener);
     }
 
 

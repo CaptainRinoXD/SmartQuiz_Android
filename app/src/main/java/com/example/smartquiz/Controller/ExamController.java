@@ -45,6 +45,18 @@ public class ExamController extends BaseController {
         });
     }
 
+    public void updateSessionIds(
+            String examId,
+            List<String> sessionIdsToUpdate,
+            OnCompleteListener<Void> listener) {
+
+        DocumentReference docRef = db.collection("exams").document(examId);
+
+        // Sử dụng update để thay thế toàn bộ mảng sessionId
+        docRef.update("sessionId", sessionIdsToUpdate)
+                .addOnCompleteListener(listener);
+    }
+
     /**
      * Thêm danh sách studentIds vào Class.
      * Sử dụng FieldValue.arrayUnion để tự động loại bỏ ID trùng lặp.

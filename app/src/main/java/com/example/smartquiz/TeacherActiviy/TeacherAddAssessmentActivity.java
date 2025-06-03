@@ -1,8 +1,10 @@
 package com.example.smartquiz.TeacherActiviy;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -25,11 +27,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.smartquiz.Controller.AssessmentController;
 import com.example.smartquiz.Controller.ExamController;
+import com.example.smartquiz.Controller.SubmissionController;
 import com.example.smartquiz.Controller.UserController;
 import com.example.smartquiz.Header_Controller_Teacher;
 import com.example.smartquiz.Model.Assessment;
 import com.example.smartquiz.Model.AssessmentSession;
 import com.example.smartquiz.Model.Exam;
+import com.example.smartquiz.Model.Submission;
 import com.example.smartquiz.Model.User;
 import com.example.smartquiz.R;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -46,6 +50,8 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -208,6 +214,30 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
                 newSession.setTitle(sessionName);
                 newSession.setStudentsInSession(studentInSession);
 
+
+
+
+                //time picker
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(dialogSelectedYear[0], dialogSelectedMonth[0], dialogSelectedDay[0], dialogSelectedHour[0], dialogSelectedMinute[0], 0);
+                Date selectedDateTime = calendar.getTime();
+
+                Date now = new Date();
+                if(selectedDateTime.after(now)) {
+                    long diffInMillis = selectedDateTime.getTime() - now.getTime();
+                    long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMillis);
+                    Log.d("SessionCheck", "Thời gian cách biệt: " + diffInMinutes + " phút");
+                    if(diffInMinutes <= 30) {
+                        Toast.makeText(TeacherAddAssessmentActivity.this, "Không thể chọn ngày giờ quá gần giờ hiện tại", Toast.LENGTH_SHORT).show();
+                        return;
+                    } else if(diffInMinutes > 30) {
+                        newSession.setTime(selectedDateTime);
+                    }
+                } else {
+                    Toast.makeText(TeacherAddAssessmentActivity.this, "Không thể chọn ngày quá giờ trong quá khứ", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 //logic for setting student isSelected
                 for (String studentId : studentInSession) {
                     assessmentController.updateStudentSelection(Assessment_id, studentId, true, (task) -> {
@@ -220,11 +250,6 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
                 }
 
 
-                //time picker
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(dialogSelectedYear[0], dialogSelectedMonth[0], dialogSelectedDay[0], dialogSelectedHour[0], dialogSelectedMinute[0], 0);
-                Date selectedDateTime = calendar.getTime();
-                newSession.setTime(selectedDateTime);
 
                 assessmentController.addSession(Assessment_id,newSession,(documentReference)->{
                             Toast.makeText(TeacherAddAssessmentActivity.this, "Tạo ca thành công!", Toast.LENGTH_SHORT).show();
@@ -254,7 +279,7 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
             //Display information from selected session
             assessmentController.getSessionsById(Assessment_id,sessionId,(valueMain, errorMain)->{
                 AssessmentSession assessmentSession = valueMain.toObject(AssessmentSession.class);
-                
+                if (assessmentSession == null) {return;}
 
                 updateSession.set(assessmentSession);
                 SessionNameText.setText(assessmentSession.getTitle());
@@ -440,6 +465,9 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
         TextView statusTextView = dialogView.findViewById(R.id.textView13);
         TextView emptyStateTextView = dialogView.findViewById(R.id.emptyStateTextView);
 
+        //handel if when update there are session that already done
+        AtomicBoolean isValid = new AtomicBoolean(true);
+
         if(isUpdate){
             ExamNameText.setText(updatedExam.getTitle());
             durationText.setText(String.valueOf(updatedExam.getDuration()));
@@ -454,13 +482,38 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
                 for (DocumentSnapshot document : value.getDocuments()){
                     AssessmentSession assessmentSession = document.toObject(AssessmentSession.class);
                     CheckBox sessionCheckBox = new CheckBox(TeacherAddAssessmentActivity.this);
+
                     if (isUpdate) {
                         for ( String sessionId : updatedExam.getSessionId()) {
                             if(Objects.equals(assessmentSession.getId(),sessionId)){
                                 sessionCheckBox.setChecked(true);
+
+                                //disable checkbox session is no more valid and not allow to upload exam question
+                                Date sessionDate = assessmentSession.getTime();
+                                Date now = new Date();
+                                if(now.after(sessionDate)) {
+                                    long diffInMillis = now.getTime() - sessionDate.getTime();
+                                    long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMillis);
+                                    sessionCheckBox.setEnabled(false);
+                                    durationText.setEnabled(false);
+                                    ExamNameText.setEnabled(false);
+                                    isValid.set(false);
+                                    submit_create_ExamBtn.setText("Chỉnh Ca Đề");
+                                }
                             }
                         }
                     }
+
+                    //disable checkbox if session is no more valid
+                    Date sessionDate = assessmentSession.getTime();
+                    Date now = new Date();
+                    if(now.after(sessionDate)) {
+                        long diffInMillis = now.getTime() - sessionDate.getTime();
+                        long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMillis);
+                        sessionCheckBox.setEnabled(false);
+                    }
+
+
                     sessionCheckBox.setTag(assessmentSession.getId());
                     sessionCheckBox.setText("Ca thi: "+assessmentSession.getTitle());
                     sessionCheckBox.setTextSize(16);
@@ -491,6 +544,17 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
             if(isUpdate){
                 intent.putExtra("EXAM_ID",updatedExam.getId());
                 intent.putExtra("CREATED_BY", updatedExam.getCreatedBy());
+
+                if (!isValid.get()) {
+                    ExamController examController = new ExamController();
+                    examController.updateSessionIds(updatedExam.getId(),session_arrayList,task ->{
+                        if (task.isSuccessful()){
+                            Toast.makeText(this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                        }
+                    });
+                    return;
+                }
             }
             intent.putExtra("ASSESSMENT_ID", Assessment_id);
             intent.putExtra("EXAM_TITLE", examName);
@@ -531,8 +595,62 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
                         session_name.setTextColor(Color.BLACK);
 
                         session_name.setOnClickListener(v -> {
-                            //Toast.makeText(TeacherAddAssessmentActivity.this, "Đã chọn ca thi: " + assessmentSession.getTitle(), Toast.LENGTH_SHORT).show();
-                            dialog_add_session(true,assessmentSession.getId());
+                            Date sessionDate = assessmentSession.getTime();
+                            Date now = new Date();
+                            if(now.after(sessionDate)) {
+                                long diffInMillis = now.getTime() - sessionDate.getTime();
+                                long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMillis);
+                                Log.d("SessionCheck", "Thời gian cách biệt: " + diffInMinutes + " phút");
+                                if(diffInMinutes <= 30) {
+
+                                    Toast.makeText(TeacherAddAssessmentActivity.this, "Ca thi đang trong giờ thi!", Toast.LENGTH_SHORT).show();
+                                } else {
+
+                                    Toast.makeText(TeacherAddAssessmentActivity.this, "Ca thi đã quá hạn không thể sửa!", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                dialog_add_session(true,assessmentSession.getId());
+                            }
+
+                        });
+
+                        session_name.setOnLongClickListener(v->{
+                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                                builder.setMessage("Xóa ca thi: "+assessmentSession.getTitle() )
+                                        .setTitle("Xác nhận xóa");
+
+                                builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        ExamController examController = new ExamController();
+                                        examController.fetchExamsBySessionId(assessmentSession.getId(),(valueSEC, errorSEC)->{
+                                            if (valueSEC.isEmpty()){
+                                                assessmentController.updateArrayOfStudentSelection(Assessment_id,assessmentSession.getStudentsInSession(),false,task->{
+                                                    if (task.isSuccessful()){
+                                                        Log.d(TAG, "updateArrayOfStudentSelection: " + assessmentSession.getStudentsInSession());
+                                                    }
+                                                });
+                                                assessmentController.deleteSession(Assessment_id,assessmentSession.getId(),task->{
+                                                    if (task.isSuccessful()){
+                                                        Toast.makeText(TeacherAddAssessmentActivity.this, "Xóa thành công!", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            } else {
+                                                Toast.makeText(TeacherAddAssessmentActivity.this, "Không thể xóa ca thi đang có đề!", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+                                });
+
+                                builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.dismiss();
+                                    }
+                                });
+
+                                AlertDialog dialog = builder.create();
+
+                                dialog.show();
+                                return true;
                         });
 
                         list_session_ln.addView(session_name);
@@ -580,6 +698,7 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
                     Set<String> addedSessions = new HashSet<>();
                     final int totalSessions = exam.getSessionId().size();
                     final AtomicInteger loadedSessions = new AtomicInteger(0);
+                    AtomicBoolean canExamBeUpdate = new AtomicBoolean(true);
 
                     for (String sessionId : exam.getSessionId()) {
                         AssessmentController assessmentController1 = new AssessmentController();
@@ -601,6 +720,8 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
                                     session_name.setTextColor(Color.DKGRAY);
 
                                     sessionContainer.addView(session_name);
+
+
                                 }
 
                                 // Check if this is the last session to load
@@ -609,17 +730,54 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
                                 }
 
                                 examContainer.setOnClickListener(v -> {
-                                    dialog_add_exam(true, exam);
+                                    if (canExamBeUpdate.get()) dialog_add_exam(true, exam);
                                 });
                             }
                         });
                     }
+
+                    //Delete exam
+                    examContainer.setOnLongClickListener(v->{
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setMessage("Xóa đề thi: "+exam.getTitle() )
+                                .setTitle("Xác nhận xóa");
+
+                        builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                SubmissionController submissionController = new SubmissionController();
+                                submissionController.getSubmissionByExamId(exam.getId(),(submission)->{
+                                    if(submission == null){
+                                        examController.deleteExam(exam.getId(),task->{
+                                            if (task.isSuccessful()){
+                                                Toast.makeText(TeacherAddAssessmentActivity.this, "Xóa thành công!", Toast.LENGTH_SHORT).show();
+                                                fetchSessionExamToScrollView();
+                                            }
+                                        });
+                                    } else {
+                                        Toast.makeText(TeacherAddAssessmentActivity.this, "Không thể xóa đề thi đã có bài nộp!", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        });
+
+                        builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                        AlertDialog dialog = builder.create();
+
+                        dialog.show();
+                        return true;
+                    });
 
                     list_exam_ln.addView(examContainer);
                 }
             }
         });
     }
+
 
     private int dpToPx(int dp) {
         float density = getResources().getDisplayMetrics().density;
