@@ -227,12 +227,13 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
                     long diffInMillis = selectedDateTime.getTime() - now.getTime();
                     long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMillis);
                     Log.d("SessionCheck", "Thời gian cách biệt: " + diffInMinutes + " phút");
-                    if(diffInMinutes <= 30) {
-                        Toast.makeText(TeacherAddAssessmentActivity.this, "Phải chọn giờ thi cách giờ hiện tại 30 phút", Toast.LENGTH_SHORT).show();
-                        return;
-                    } else if(diffInMinutes > 30) {
-                        newSession.setTime(selectedDateTime);
-                    }
+                    newSession.setTime(selectedDateTime);
+//                    if(diffInMinutes <= 0) {
+//                        Toast.makeText(TeacherAddAssessmentActivity.this, "Phải chọn giờ thi cách giờ hiện tại 1 phút", Toast.LENGTH_SHORT).show();
+//                        return;
+//                    } else if(diffInMinutes > 30) {
+//                        newSession.setTime(selectedDateTime);
+//                    }
                 } else {
                     Toast.makeText(TeacherAddAssessmentActivity.this, "Không thể chọn ngày quá giờ trong quá khứ", Toast.LENGTH_SHORT).show();
                     return;
@@ -454,7 +455,7 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
 
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_teacher_create_exam, null);
         dialog.setContentView(dialogView);
-        dialog.show();
+
 
         TextView ExamNameText = dialogView.findViewById(R.id.ExamNameText);
         EditText durationText = dialogView.findViewById(R.id.durationText);
@@ -567,6 +568,8 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
         cancelBtn.setOnClickListener(v -> {
             dialog.dismiss();
         });
+
+        dialog.show();
     }
 
     private void fetchSessionExamToScrollView() {
