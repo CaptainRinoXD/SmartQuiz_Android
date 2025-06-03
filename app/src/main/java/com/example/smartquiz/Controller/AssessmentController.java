@@ -396,5 +396,16 @@ public class AssessmentController extends BaseController{
                 .addOnCompleteListener(listener);
     }
 
+    public void deleteAssessment(
+            String assessmentId,
+            OnCompleteListener<Void> listener) {
+
+        DocumentReference docRef = db.collection("Assessment")
+                .document(assessmentId);
+
+        docRef.delete()
+                .addOnCompleteListener(listener);
+    }
+
 
 }

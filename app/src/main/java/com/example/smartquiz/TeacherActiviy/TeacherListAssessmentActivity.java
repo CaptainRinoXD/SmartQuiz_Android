@@ -179,6 +179,8 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
             dialog_add_assessment(true, assessment);
             return true;
         });
+
+
     }
 
     private int dpToPx(int dp) {
@@ -200,6 +202,8 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
         EditText AssessmentNameText = dialogView.findViewById(R.id.ExamNameText);
         Button cancelBtn = dialogView.findViewById(R.id.cancelBtn);
         Button createAssessmentBtn = dialogView.findViewById(R.id.createAssessmentBtn);
+        Button delAssessmentBtn = dialogView.findViewById(R.id.delAssessmentBtn);
+        delAssessmentBtn.setVisibility(View.GONE);
 
         LinearLayout student_list = dialogView.findViewById(R.id.list_exam_dialog);
         List<Assessment.StudentInfo> studentInfoList = new ArrayList<>();
@@ -241,6 +245,21 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
                 });
             });
         } else {
+            delAssessmentBtn.setVisibility(View.VISIBLE);
+            delAssessmentBtn.setOnClickListener(v -> {
+                AssessmentController assessmentController = new AssessmentController();
+                assessmentController.getAllSessions(updateAssessment.getId(), (value,error)->{
+                    assert value != null;
+                    if(value.isEmpty()) {
+                        assessmentController.deleteAssessment(updateAssessment.getId(),null);
+                        Toast.makeText(TeacherListAssessmentActivity.this, "Xóa thành công kì thi", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(TeacherListAssessmentActivity.this, "Kì thi vẫn còn ca thi", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
+
             textView13.setText("Cập nhật kì thi");
             createAssessmentBtn.setText("Cập nhật");
             AssessmentNameText.setText(updateAssessment.getTitle());
@@ -273,7 +292,6 @@ public class TeacherListAssessmentActivity extends AppCompatActivity {
                 });
             });
         }
-
     }
 
     interface OnCanUpdateCheckListener {

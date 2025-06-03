@@ -11,11 +11,11 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout4"
-        android:layout_width="375dp"
-        android:layout_height="560dp"
+        android:layout_width="374dp"
+        android:layout_height="640dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
@@ -110,10 +110,9 @@
             android:translationZ="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.555"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView15"
-            app:layout_constraintVertical_bias="0.846">
+            app:layout_constraintVertical_bias="0.394">
 
             <LinearLayout
                 android:id="@+id/list_exam_dialog"
@@ -140,31 +139,45 @@
 
         <Button
             android:id="@+id/cancelBtn"
-            android:layout_width="115dp"
-            android:layout_height="39dp"
+            android:layout_width="121dp"
+            android:layout_height="45dp"
             android:background="@drawable/red_box"
             android:text="Thoát"
             app:backgroundTint="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.188"
+            app:layout_constraintHorizontal_bias="0.209"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/scrollView4"
-            app:layout_constraintVertical_bias="0.448" />
+            app:layout_constraintVertical_bias="0.107" />
 
         <Button
             android:id="@+id/createAssessmentBtn"
-            android:layout_width="115dp"
-            android:layout_height="39dp"
+            android:layout_width="119dp"
+            android:layout_height="48dp"
             android:background="@drawable/green_box"
             android:text="Tạo kì thi"
             app:backgroundTint="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.803"
+            app:layout_constraintHorizontal_bias="0.796"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/scrollView4"
-            app:layout_constraintVertical_bias="0.448" />
+            app:layout_constraintVertical_bias="0.111" />
+
+        <Button
+            android:id="@+id/delAssessmentBtn"
+            android:layout_width="269dp"
+            android:layout_height="44dp"
+            android:background="@drawable/blue_box"
+            android:text="Xóa kì thi"
+            app:backgroundTint="@null"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/scrollView4"
+            app:layout_constraintVertical_bias="0.811" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -228,7 +228,7 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
                     long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMillis);
                     Log.d("SessionCheck", "Thời gian cách biệt: " + diffInMinutes + " phút");
                     if(diffInMinutes <= 30) {
-                        Toast.makeText(TeacherAddAssessmentActivity.this, "Không thể chọn ngày giờ quá gần giờ hiện tại", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeacherAddAssessmentActivity.this, "Phải chọn giờ thi cách giờ hiện tại 30 phút", Toast.LENGTH_SHORT).show();
                         return;
                     } else if(diffInMinutes > 30) {
                         newSession.setTime(selectedDateTime);
@@ -705,7 +705,7 @@ public class TeacherAddAssessmentActivity extends AppCompatActivity {
                         assessmentController1.getSessionsById(Assessment_id, sessionId, (value1, error1) -> {
                             if(value1 != null) {
                                 AssessmentSession assessmentSession = value1.toObject(AssessmentSession.class);
-                                assert assessmentSession != null;
+                                if(assessmentSession== null) {return;}
                                 String sessionName = assessmentSession.getTitle();
 
                                 // Prevent duplicate sessions

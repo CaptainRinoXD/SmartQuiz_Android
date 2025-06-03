@@ -54,6 +54,7 @@ public class TeacherAddClassActivity extends AppCompatActivity {
     List<String> studentArrayListString;
     LinearLayout studentToAddList;
     TextView emptyStateTextView;
+    TextView deleteClass;
     private static final String TAG = "TeacherAddClassActivity";
 
 
@@ -78,6 +79,7 @@ public class TeacherAddClassActivity extends AppCompatActivity {
         studentToAddList = findViewById(R.id.list_exam_dialog);
         emptyStateTextView = findViewById(R.id.emptyStateTextView);
         classNameText = findViewById(R.id.ExamNameText);
+        deleteClass = findViewById(R.id.textView13);
 
         studentArayListToDisplay = new ArrayList<>();
         studentArrayListString = new ArrayList<>();
@@ -107,6 +109,26 @@ public class TeacherAddClassActivity extends AppCompatActivity {
 
     private void isUpdateClasses() {
         String classId = getIntent().getStringExtra("CLASS_ID");
+        // xóa lớp
+        deleteClass.setText("Bấm để xóa lớp.");
+        deleteClass.setOnClickListener(v->{
+            AssessmentController assessmentController = new AssessmentController();
+            assessmentController.getAssessmentsByClassId(classId,(query)->{
+                if(query.isEmpty()) {
+                    ClassesController classesController = new ClassesController();
+                    classesController.deleteClass(classId, (task) -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(this, "Xóa lớp thành công.", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    });
+                } else {
+                    Toast.makeText(this, "Không thể xóa lớp vì kì thi đang tồn tại.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+
+        //set all student already in class Assessment to arraylist to not allow deletion
         ClassesController classesController = new ClassesController();
         classesController.getClassDocumentById(classId, (task) -> {
             if (task.isSuccessful()) {
